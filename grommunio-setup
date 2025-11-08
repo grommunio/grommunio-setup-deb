@@ -150,7 +150,7 @@ echo "postfix	postfix/main_mailer_type string 'Internet Site'" | debconf-set-sel
 SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
   postfix-mysql php php-igbinary php-redis sqlite3 php php-fpm curl fetchmail
   rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
-  jq firewalld clamav clamav-freshclam clamav-daemon
+  jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
   libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
 apt-get install "${SYSTEM_PACKAGES[@]}"
 
@@ -245,6 +245,17 @@ if [ $NO_APT_SETUP -eq 0 ]; then
 fi
 writelog "Installing Grommunio-Packages"
 apt-get update
+# Fix nginx not starting becuase of no SSL certs - use dummy snakeoil self-signed cert
+apt-get install grommunio-common grommunio-admin-common
+cat >/etc/grommunio-common/nginx/ssl_certificate.conf <<EOF
+ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+EOF
+if [ -e /etc/grommunio-admin-common/nginx-ssl.conf ]; then
+  rm -f /etc/grommunio-admin-common/nginx-ssl.conf
+fi
+ln -s /etc/grommunio-common/nginx/ssl_certificate.conf /etc/grommunio-admin-common/nginx-ssl.conf
+
 # reinstall in case of "removealldata"
 apt-get install "${PACKAGES[@]}" --reinstall
 # tickets are useless... grommunio-{dav,sync} -upsteam.conf's

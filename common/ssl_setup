@@ -107,7 +107,7 @@ letsencrypt() {
   [ -e "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" ] && mv "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" "/etc/nginx/conf.d/grommunio.conf"
 
   # You only have to symlink the letsencrypt cert
-  ln -snf "${SSL_BUNDLE_T}" "/etc/letsencrypt/live/${FQDN}/fullchain.pem"
+  ln -snf "/etc/letsencrypt/live/${FQDN}/fullchain.pem" "${SSL_BUNDLE_T}"
   # Copy key so that gromox:gromox can be made to access it
   # - by default it does not change across renewals
   cp -f  "/etc/letsencrypt/live/${FQDN}/privkey.pem" "${SSL_KEY_T}"
