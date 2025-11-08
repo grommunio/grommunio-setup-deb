@@ -246,7 +246,7 @@ fi
 writelog "Installing Grommunio-Packages"
 apt-get update
 # Fix nginx not starting becuase of no SSL certs - use dummy snakeoil self-signed cert
-apt-get install grommunio-common grommunio-admin-common
+apt-get install grommunio-common grommunio-admin-common --reinstall
 cat >/etc/grommunio-common/nginx/ssl_certificate.conf <<EOF
 ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
 ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
