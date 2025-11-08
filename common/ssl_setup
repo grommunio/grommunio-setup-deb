@@ -40,7 +40,7 @@ On that dialog, you must choose \"View Certificate\" and explicitly install the 
   openssl req -x509 -new -nodes -out "${SSL_BUNDLE_T}" -keyout "${SSL_KEY_T}" \
           -subj "/CN=${FQDN}" -addext "subjectAltName = DNS:${FQDN}, DNS:autodiscover.${DOMAIN}" >>"${LOGFILE}" 2>&1
 
-  cp -f "${SSL_BUNDLE_T}" "/etc/pki/trust/anchors/"
+  cp -f "${SSL_BUNDLE_T}" "/usr/local/share/ca-certificates/"
   update-ca-certificates
 
 }
@@ -55,7 +55,7 @@ fullca()
     return 1
   fi
   return 0
-  cp -f "${SSL_BUNDLE_T}" "/etc/pki/trust/anchors/"
+  cp -f "${SSL_BUNDLE_T}" "/usr/local/share/ca-certificates/"
   update-ca-certificates
 
 }
@@ -68,7 +68,7 @@ owncert() {
   fi
   cp -f "${SSL_BUNDLE}" "${SSL_BUNDLE_T}"
   cp -f "${SSL_KEY}" "${SSL_KEY_T}"
-  cp -f "${SSL_BUNDLE_T}" "/etc/pki/trust/anchors/"
+  cp -f "${SSL_BUNDLE_T}" "/usr/local/share/ca-certificates/"
   update-ca-certificates
   return 0
 
@@ -77,7 +77,7 @@ owncert() {
 letsencrypt() {
 
   progress 0
-  apt-get install -y python3-certbot python3-certbot-nginx nginx >>"${LOGFILE}" 2>&1
+  apt-get install -y python3-yaml python3-certbot python3-certbot-nginx nginx >>"${LOGFILE}" 2>&1
   progress 60
   {
     firewall-cmd --add-port=80/tcp --zone=public --permanent
@@ -87,9 +87,8 @@ letsencrypt() {
 
   [ -e "/etc/nginx/conf.d/grommunio.conf" ] && mv "/etc/nginx/conf.d/grommunio.conf" "/etc/nginx/conf.d/grommunio.conf.grommunio-setup"
 
-  systemctl stop nginx >>"${LOGFILE}" 2>&1
   progress 75
-  certbot certonly -n --standalone --agree-tos \
+  certbot certonly -n --nginx --agree-tos \
     --preferred-challenges http \
     --cert-name="${FQDN}" \
     -d "${SSL_DOMAINS}" \
@@ -107,12 +106,21 @@ letsencrypt() {
 
   [ -e "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" ] && mv "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" "/etc/nginx/conf.d/grommunio.conf"
 
-  cat "/etc/letsencrypt/live/${FQDN}/cert.pem" "/etc/letsencrypt/live/${FQDN}/fullchain.pem" > "${SSL_BUNDLE_T}"
-  cp -f "/etc/letsencrypt/live/${FQDN}/privkey.pem" "${SSL_KEY_T}"
+  # You only have to symlink the letsencrypt cert
+  ln -snf "${SSL_BUNDLE_T}" "/etc/letsencrypt/live/${FQDN}/fullchain.pem"
+  # Copy key so that gromox:gromox can be made to access it
+  # - by default it does not change across renewals
+  cp -f  "/etc/letsencrypt/live/${FQDN}/privkey.pem" "${SSL_KEY_T}"
 
-  {
-    systemctl enable grommunio-certbot-renew.timer
-    systemctl start grommunio-certbot-renew.timer
-  } >>"${LOGFILE}" 2>&1
+  # set up certbot renewal hook
+  local CONFIG="no_sans: false
+sans: [${SSL_DOMAINS}]
+systemd_reload: []
+systemd_restart: [postfix, gromox-http, gromox-imap, gromox-pop3, gromox-delivery-queue]
+"
+  echo "$CONFIG" > /etc/grommunio-common/grommunio-certbot-deploy-hook.conf
+  ln -snf /etc/letsencrypt/renewal-hooks/deploy/80-grommunio-certbot-deploy-hook /usr/share/grommunio-common/scripts/grommunio-certbot-deploy-hook
+
+  echo "Ltesencrypt Certbot certs installed" >> "${LOGFILE}" 2>&1
 
 }
