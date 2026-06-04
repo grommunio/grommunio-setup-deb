@@ -20,6 +20,10 @@ PKG_TEMPLATES='
 grommunio-pkg-bits/setup-options-select
 '
 
+configure_setup () {
+	return 0
+}
+
 
 case "$PROGNAME" in
 	setup-grommunio-setup)

@@ -1,9 +1,10 @@
-grommunio-setup-deb (1.4.6) unstable; urgency=medium
+grommunio-setup-deb (1.4.7) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
+  * add postinst and postrm scripts
 
- -- grommunio <dev@grommunio.com>  Thu, 04 Jun 2026 13:53:29 +1200
+ -- grommunio <dev@grommunio.com>  Thu, 04 Jun 2026 20:02:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 
