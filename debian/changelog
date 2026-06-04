@@ -1,10 +1,10 @@
-grommunio-setup-deb (1.4-0) unstable; urgency=medium
+grommunio-setup-deb (1.4) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
 
  -- grommunio <dev@grommunio.com>  Thu, 04 Jun 2026 13:53:29 +1200
 
-grommunio-setup-deb (1.2-0) unstable; urgency=medium
+grommunio-setup-deb (1.2) unstable; urgency=medium
 
   * Initial Debian package.
 
