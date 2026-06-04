@@ -11,72 +11,60 @@ if [ "$(id -u)" -ne 0 ]; then
   exec sudo "${BASH_SOURCE[0]}"
 fi
 
+# Source set up variables and setup-include.sh
+. /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
+
 CFG_FILE='/etc/grommunio-setup/grommunio-setup.conf'
 PKGED_CFG_FILE='/etc/grommunio-setup/packaged.conf'
 PROGNAME=`basename "$0"`
 
-# Process command line arguments
-USAGE="Usage: $PROGNAME [-ahx]"
-usage () {
-  echo "$USAGE"  1>&2
-  exit 2
+grommunio_setup_usage () {
+	local BLAH="
+  $PROGNAME: [-abhDxX] [-f frontend] [-s pkg-selection] [-p priority]
+
+"
+	echo -n "$BLAH" 1>&2
 }
 
-usage_full () {
-  echo "$USAGE"  1>&2
-  echo "" 1>&2
-  echo "    -a    --apt-setup     Set up apt" 1>&2
-  echo "    -h    --help          This help" 1>&2
-  echo "    -x    --no-apt-setup  Don't set up apt" 1>&2
-  echo "" 1>&2
-  exit 2
-}
+grommunio_setup_vusage () {
+	local BLAH="
+         -a  --admin-password     Prompt for admin password via /dev/tty
+                                  Set GSETUP_ADMIN_PASSWORD to bypass this.
+         -b  --db-password        Prompt for grommunio DB password via /dev/tty
+                                  Set GSETUP_DB_PASSWORD to bypass this.
+         -D  --no-def-priority    Show all questions, not just default debconf
+                                  priority or higher
+         -f  --frontend           select debconf frontend to use
+         -h  --help               print this help
+         -p  --priority           show questions of this priority or higher
+         -s  --option-select      option packages to be operated on, comma separated
+	 -x  --repo-setup         setup up package repository definition
+	 -X  --no-repo-setup      don't setup package repository definition
 
-OPTS=$(getopt -o ahx -l apt-setup,help,no-apt-setup -n "$PROGNAME" -- "$@")
-if [ $? -ne 0 ]; then
-  echo "${PROGNAME}: Failed to parse options." 1>&2
-  exit 2
-fi
-# Reset the positional parameters to the parsed options
-eval set -- "$OPTS"
+         Debconf frontends available: 'dialog', 'readline', 'noninteractive',
+                                      'gnome', 'kde', 'editor', 'web'
+         Question priorities: 'criticial', 'high', 'medium' 'low'
+         If no question priority is selected all questions are shown (ie
+         priority 'low' or higher)
+
+"
+	grommunio_setup_usage
+	echo -n "$BLAH" 1>&2
+}
 
 # setable settings here
 NO_APT_SETUP=0
 [ -e "$CFG_FILE" ] && . "$CFG_FILE"
 # override various settings for packaged setup script
 [ -e "$PKGED_CFG_FILE" ] && . "$PKGED_CFG_FILE"
-# Unsettable settings here
-# Process the options
-while true; do
-  case "$1" in
-    -a | --apt-setup)
-      NO_APT_SETUP=0
-      shift
-      ;;
-    -h | --help)
-      usage_full
-      shift
-      ;;
-    -x | --no-apt-setup)
-      NO_APT_SETUP=1
-      shift
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      echo "${PROGNAME}: Internal error!"
-      exit 2
-      ;;
-  esac
-done
+# convert to new variables
+GSETUP_REPO_SETUP='true'
+[ $NO_APT_SETUP -ne 0 ] && GSETUP_REPO_SETUP='false'
 
-if [ $# -ne 0 ]; then
-	usage
-fi
+CMD_MODE='setup' CMD_SHORT_ARGS='abDhxXf:p:s:' \
+CMD_LONG_ARGS='admin-password,db-password,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup' \
+grommunio_cmd_args "$@"
 
-export DEBIAN_FRONTEND=noninteractive
 
 DATADIR="${0%/*}"
 if [ "${DATADIR}" = "$0" ]; then
@@ -152,7 +140,9 @@ SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
   rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
   jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
   libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
+export DEBIAN_FRONTEND=noninteractive
 apt-get install "${SYSTEM_PACKAGES[@]}"
+unset DEBIAN_FRONTEND
 
 phpdismod opcache >>"${LOGFILE}" 2>&1
 
@@ -234,7 +224,7 @@ PACKAGES=(gromox grommunio-admin-api grommunio-admin-web grommunio-index
   grommunio-admin-common grommunio-common grommunio-web grommunio-sync
   grommunio-dav grommunio-dbconf nginx-module-vts)
 . "${DATADIR}/common/repo"
-if [ $NO_APT_SETUP -eq 0 ]; then
+if [ "$GSETUP_REPO_SETUP" = 'true' ]; then
   setup_repo
   if [ $? -ne 0 ]; then
     writelog "Exiting - trying to set up apt repos when already defined"

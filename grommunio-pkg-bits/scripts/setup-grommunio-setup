@@ -28,5 +28,7 @@ configure_setup () {
 case "$PROGNAME" in
 	setup-grommunio-setup)
 		check_if_root
+		start_debconf -x 'grommunio-setup' "$@"
+		configure_setup $ARGS
 		;;
 esac
