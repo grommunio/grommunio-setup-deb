@@ -17,7 +17,7 @@ shared/grommunio/admin-password-mismatch
 shared/grommunio/admin-password-must-enter
 '
 PKG_TEMPLATES='
-grommunio-setup/setup-options-select
+grommunio-pkg-bits/setup-options-select
 '
 
 
