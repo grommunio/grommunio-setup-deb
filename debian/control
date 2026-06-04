@@ -13,7 +13,12 @@ Depends: ${misc:Depends},
   dialog,
   openssl,
   sudo,
-  grommunio-setup-framework
+  jq,
+  esh,
+  trurl,
+  debconf,
+  debconf-i18n
+  debconf-utils
 Conflicts: grammm-setup
 Description: Setup script for grommunio
  This package provides an interactive setup script for grommunio.
