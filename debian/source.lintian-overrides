@@ -1,0 +1,10 @@
+
+# OBS debtransform does things with debian/changelog 
+grommunio-setup-deb source: no-nmu-in-changelog
+
+# OBS debtransform does things with debian/changelog 
+grommunio-setup-deb source: source-nmu-has-incorrect-version-number
+
+# OBS debtransform does things with debian/changelog 
+grommunio-setup-deb source: odd-historical-debian-changelog-version
+

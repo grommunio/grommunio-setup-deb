@@ -1,0 +1,14 @@
+Source: grommunio-setup-deb
+Section: admin
+Priority: optional
+Maintainer: grommunio <dev@grommunio.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://grommunio.com/
+
+Package: grommunio-setup
+Architecture: all
+Depends: ${misc:Depends}, curl, dialog, openssl, sudo, jq
+Conflicts: grammm-setup
+Description: Setup script for grommunio
+ This package provides an interactive setup script for grommunio.

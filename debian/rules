@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+
+%:
+	-mkdir -p debian/source && echo "1.0" > debian/source/format
+	# Fix linitan warning about non executable
+	-chmod 0744 common/*
+	dh $@
+
