@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+PROGNAME=$(basename "$0")
+BOOTSTRAPPED=0
+AAPI_RELOAD=0
+AUTO_CONFIG='false'
+
+. /usr/share/grommunio-pkg-bits/scripts/setup-include.sh
+SHARED_TEMPLATES='
+shared/grommunio/site-fqdn
+shared/grommunio/auto-config
+shared/grommunio/admin-password
+shared/grommunio/admin-password-again
+shared/grommunio/admin-password-mismatch
+shared/grommunio/admin-password-must-enter
+'
+PKG_TEMPLATES='
+grommunio-setup/setup-options-select
+'
+
+
+case "$PROGNAME" in
+	setup-grommunio-setup)
+		check_if_root
+		;;
+esac

@@ -1,4 +1,6 @@
 common usr/share/grommunio-setup/
+scripts usr/share/grommunio-setup/
 grommunio-setup usr/share/grommunio-setup/
 etc/grommunio-setup.conf etc/grommunio-setup
 debian/packaged.conf etc/grommunio-setup
+grommunio-pkg-bits usr/share/
