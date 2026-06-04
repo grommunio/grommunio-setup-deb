@@ -17,7 +17,7 @@ Depends: ${misc:Depends},
   esh,
   trurl,
   debconf,
-  debconf-i18n
+  debconf-i18n,
   debconf-utils
 Conflicts: grammm-setup
 Description: Setup script for grommunio
