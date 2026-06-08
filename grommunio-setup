@@ -18,7 +18,15 @@ CFG_FILE='/etc/grommunio-setup/grommunio-setup.conf'
 PKGED_CFG_FILE='/etc/grommunio-setup/packaged.conf'
 PROGNAME=`basename "$0"`
 
-setup_debconf () {
+setup_options_debconf () {
+	# Appliance setup script, behave like a Debian system
+	GSETUP_AUTO_CONFIG="true"
+	GSETUP_ADMIN_PASSWORD="$ADMIN_PASS"
+	GSETUP_SITE_FQDN="$FQDN"
+	GSETUP_DB_HOST="$MYSQL_HOST"
+	GSETUP_DB_NAME="$MYSQL_DB"
+	GSETUP_DB_USER="$MYSQL_USER"
+	GSETUP_DB_PASSWORD="$MYSQL_PASS"
 	[ ! "${DEBIAN_HAS_FRONTEND:-}" ] && \
 		. /usr/share/grommunio-pkg-bits/scripts/debconf-communicate.sh
 	gsetup_preseed
@@ -33,11 +41,12 @@ setup_debconf () {
 	# Stuff to do things goes here
 	local PKG_SELECT=$(calc_option_pkg_select -s "$OPT_SELECT")
 	install_packages ${PKG_SELECT}
+	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
 
 grommunio_setup_usage () {
 	local BLAH="
-  $PROGNAME: [-abhDgGxX] [-f frontend] [-n db-name] [-p priority] [-q site-fqdn] [-t db-host] [-u db-user] [-s pkg-selection]
+  $PROGNAME: [-abhDxX] [-f frontend] [-n db-name] [-p priority] [-q site-fqdn] [-t db-host] [-u db-user] [-s pkg-selection]
 
 "
 	echo -n "$BLAH" 1>&2
@@ -52,8 +61,6 @@ grommunio_setup_vusage () {
          -D  --no-def-priority    Show all questions, not just default debconf
                                   priority or higher
          -f  --frontend           select debconf frontend to use
-	 -g  --auto-config        presseed and set auto-config debconf setting 
-	 -G  --no-auto-config     presseed and unset auto-config debconf setting 
          -h  --help               print this help
 	 -n  --db-name            preseed the shared/grommunio/db-name setting
          -p  --priority           show questions of this priority or higher
@@ -84,8 +91,8 @@ NO_APT_SETUP=0
 GSETUP_REPO_SETUP='true'
 [ $NO_APT_SETUP -ne 0 ] && GSETUP_REPO_SETUP='false'
 
-CMD_MODE='setup' CMD_SHORT_ARGS='abDgGhxXf:n:p:q:s:t:u:' \
-CMD_LONG_ARGS='admin-password,auto-config,db-host:,db-name:,db-password,db-user:,no-auto-config,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup,site-fqdn:' \
+CMD_MODE='setup' CMD_SHORT_ARGS='abDhxXf:n:p:q:s:t:u:' \
+CMD_LONG_ARGS='admin-password,db-host:,db-name:,db-password,db-user:,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup,site-fqdn:' \
 grommunio_cmd_args "$@"
 
 # Establish lock file if first process
@@ -232,8 +239,6 @@ memory_check
 # Don't gsetup_preseed() here as values to be preseeded not yet set (-n)
 # Source g-setup vars etc (-s setup-grommunio-setup)
 do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -p setup_preseed -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
-
-exit 0
 
 unset MYSQL_DB
 unset MYSQL_HOST
@@ -1296,6 +1301,10 @@ logs:
     source: rspamd.service
 EOF
 
+setup_options_debconf
+writelog "Config stage: Install optiona feature applications"
+progress 95
+
 # grommunio-admin-api add rspamd.service
 # sadly it seems we can't remove/overwrite grommunio-antispam.service 
 # like with logs.yaml
@@ -1327,6 +1336,15 @@ options:
       - unit: redis-server@grommunio.service
       - unit: rspamd.service
 EOF
+
+if [ -n "$GSETUP_OPT_SELECT" ]; then
+	for APP in ${OPT_SELECT}; do
+	cat >> /etc/grommunio-admin-api/conf.d/services.yaml <<EOF
+     - unit: ${APP}.service
+EOF
+	done
+fi
+
 
 systemctl restart grommunio-admin-api.service
 
