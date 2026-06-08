@@ -20,7 +20,7 @@ PROGNAME=`basename "$0"`
 
 grommunio_setup_usage () {
 	local BLAH="
-  $PROGNAME: [-abhDxX] [-f frontend] [-s pkg-selection] [-p priority]
+  $PROGNAME: [-abhDgGxX] [-f frontend] [-n db-name] [-p priority] [-q site-fqdn] [-t db-host] [-u db-user] [-s pkg-selection]
 
 "
 	echo -n "$BLAH" 1>&2
@@ -35,9 +35,15 @@ grommunio_setup_vusage () {
          -D  --no-def-priority    Show all questions, not just default debconf
                                   priority or higher
          -f  --frontend           select debconf frontend to use
+	 -g  --auto-config        presseed and set auto-config debconf setting 
+	 -G  --no-auto-config     presseed and unset auto-config debconf setting 
          -h  --help               print this help
+	 -n  --db-name            preseed the shared/grommunio/db-name setting
          -p  --priority           show questions of this priority or higher
+	 -q  --site-fqdn          preseed the site-fqdn debconf setting
          -s  --option-select      option packages to be operated on, comma separated
+	 -t  --db-host            preseed the shared/grommunio/db-host setting
+	 -u  --db-user            preseed the shared/grommunio/db-user setting
 	 -x  --repo-setup         setup up package repository definition
 	 -X  --no-repo-setup      don't setup package repository definition
 
@@ -61,10 +67,14 @@ NO_APT_SETUP=0
 GSETUP_REPO_SETUP='true'
 [ $NO_APT_SETUP -ne 0 ] && GSETUP_REPO_SETUP='false'
 
-CMD_MODE='setup' CMD_SHORT_ARGS='abDhxXf:p:s:' \
-CMD_LONG_ARGS='admin-password,db-password,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup' \
+CMD_MODE='setup' CMD_SHORT_ARGS='abDgGhxXf:n:p:q:s:t:u:' \
+CMD_LONG_ARGS='admin-password,auto-config,db-host:,db-name:,db-password,db-user:,no-auto-config,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup,site-fqdn:' \
 grommunio_cmd_args "$@"
 
+# Establish lock file if first process
+#lock_gsetup_file || true
+# set up lock file processing
+setup_gsetup_lock_file 'grommunio-setup'
 
 DATADIR="${0%/*}"
 if [ "${DATADIR}" = "$0" ]; then
@@ -101,7 +111,6 @@ elif [ "$1" = "install" ]; then
   fi
 fi
 }
-
 
 apt-get update
 apt-get install dialog
@@ -201,6 +210,13 @@ memory_check() {
 }
 
 memory_check
+
+# Do optional package selection dialog
+# Don't gsetup_preseed() here as values to be preseeded not yet set (-n)
+# Source g-setup vars etc (-s setup-grommunio-setup)
+do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
+
+exit 0
 
 unset MYSQL_DB
 unset MYSQL_HOST
