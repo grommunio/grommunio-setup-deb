@@ -31,9 +31,9 @@ setup_debconf_reset () {
 
 setup_preseed () {
 	if [ -n "$GSETUP_OPT_SELECT" ]; then
-		setup_options_debconf_reset 'true'
+		setup_debconf_reset 'true'
 	else
-		setup_options_debconf_reset 'false'
+		setup_debconf_reset 'false'
 	fi
 
 	if [ -n "$GSETUP_OPT_SELECT" ]; then
