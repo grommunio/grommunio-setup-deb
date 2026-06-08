@@ -580,7 +580,7 @@ fi
 
 cat << EOF | jq > /tmp/config.json
 { "mailWebAddress": "https://${FQDN}/web",
-  "rspamdWebAddress": "https://${FQDN}:8443/antispam" }"
+  "rspamdWebAddress": "https://${FQDN}:8443/antispam" }
 EOF
 progress 0
 
