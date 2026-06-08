@@ -20,6 +20,30 @@ PKG_TEMPLATES='
 grommunio-pkg-bits/setup-options-select
 '
 
+setup_debconf_reset () {
+	local SEEN_STATE='false'
+	[ -n "$1" ] && SEEN_STATE="$1"
+	# reset dialog questions back to defaults - done here so that
+	# debconf choices can be pre-seeded
+	db_reset grommunio-setup/setup-options-select
+	db_fset grommunio-setup/setup-options-select seen "$SEEN_STATE"
+}
+
+setup_preseed () {
+	if [ -n "$GSETUP_OPT_SELECT" ]; then
+		setup_options_debconf_reset 'true'
+	else
+		setup_options_debconf_reset 'false'
+	fi
+
+	if [ -n "$GSETUP_OPT_SELECT" ]; then
+		local OPT_SELECT=$(echo "$GSETUP_OPT_SELECT" | perl -pe 's/\b /, /g')
+		db_set grommunio-setup/setup-options-select "$OPT_SELECT"
+		unset GSETUP_OPT_SELECT
+	fi
+	return 0
+}
+
 configure_setup () {
 	return 0
 }
