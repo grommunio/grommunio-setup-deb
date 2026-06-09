@@ -589,12 +589,16 @@ elif [ "${SSL_INSTALL_TYPE}" = "3" ]; then
   writelog "TLS configuration: Let's Encrypt ${SSL_EMAIL}"
 fi
 
-cat << EOF | jq > /tmp/config.json
+echo "FQDN is: '$FQDN'"
+CONFIG_JSON=$(cat << EOF
 {
   "mailWebAddress": "https://${FQDN}/web",
   "rspamdWebAddress": "https://${FQDN}:8443/antispam"
 }
 EOF
+)
+echo "$CONFIG_JSON"
+echo "$CONFIG_JSON" | jq > /tmp/config.json
 progress 0
 
 progress 10

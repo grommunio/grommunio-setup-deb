@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.4.21) unstable; urgency=medium
+grommunio-setup-deb (1.4.22) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
