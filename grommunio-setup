@@ -1316,9 +1316,9 @@ logs:
     source: rspamd.service
 EOF
 
-setup_options_debconf
 writelog "Config stage: Install optional feature applications"
 progress 95
+setup_options_debconf
 
 # grommunio-admin-api add rspamd.service
 # sadly it seems we can't remove/overwrite grommunio-antispam.service 
