@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.4.24) unstable; urgency=medium
+grommunio-setup-deb (1.4.25) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
@@ -14,8 +14,9 @@ grommunio-setup-deb (1.4.24) unstable; urgency=medium
   * Remove debug code
   * Add missing debconf questions
   * Rename setup_preseed() -> setup_debconf_preseed()
+  * Fix calc_option_pkg_select() return value issues
 
- -- grommunio <dev@grommunio.com>  Tue, 09 Jun 2026 19:03:00 +1200
+ -- grommunio <dev@grommunio.com>  Tue, 10 Jun 2026 09:16:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 

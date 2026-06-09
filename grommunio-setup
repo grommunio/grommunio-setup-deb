@@ -39,7 +39,11 @@ setup_options_debconf () {
 	[ ! "${DEBIAN_HAS_FRONTEND:-}" ] && db_stop
 
 	# Stuff to do things goes here
-	local PKG_SELECT=$(calc_option_pkg_select -s "$OPT_SELECT")
+	local PKG_FIRST=''
+	local PKG_SELECT=''
+	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
+	[ -n "$PKG_FIRST" ] && install_packages ${PKG_FIRST}
+	sleep 3
 	install_packages ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
