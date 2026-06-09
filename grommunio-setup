@@ -391,13 +391,16 @@ This name will be part of the certificates later generated. / This name will hav
 
 }
 
-ORIGFQDN=$(set_fqdn)
-FQDN="${ORIGFQDN,,}"
+FQDN=$(set_fqdn)
+# lower case FQDN, strip whitespace
+FQDN=$(echo "${FQDN,,}"|xargs)
 
 while [[ ${FQDN} =~ / ]]; do
   dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "Fully Qualified Domain Name (FQDN)" --msgbox 'The FQDN is invalid. Enter a valid FQDN.' 0 0
   FQDN=$(set_fqdn)
   dialog_exit $?
+  # lower case FQDN, strip whitespace
+  FQDN=$(echo "${FQDN,,}"|xargs)
 done
 writelog "Configured FQDN: ${FQDN}"
 
