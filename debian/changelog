@@ -12,8 +12,10 @@ grommunio-setup-deb (1.4.24) unstable; urgency=medium
   * Fix issues with apt-get() function, service restart
   * Fix FQDN having possible newlines in it - makes jq barf
   * Remove debug code
+  * Add missing debconf questions
+  * Rename setup_preseed() -> setup_debconf_preseed()
 
- -- grommunio <dev@grommunio.com>  Tue, 09 Jun 2026 16:00:00 +1200
+ -- grommunio <dev@grommunio.com>  Tue, 09 Jun 2026 19:03:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 

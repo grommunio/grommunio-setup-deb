@@ -246,7 +246,7 @@ memory_check
 # Do optional package selection dialog
 # Don't gsetup_preseed() here as values to be preseeded not yet set (-n)
 # Source g-setup vars etc (-s setup-grommunio-setup)
-do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -p setup_preseed -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
+do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -p setup_debconf_preseed -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
 
 unset MYSQL_DB
 unset MYSQL_HOST

@@ -15,6 +15,11 @@ shared/grommunio/admin-password
 shared/grommunio/admin-password-again
 shared/grommunio/admin-password-mismatch
 shared/grommunio/admin-password-must-enter
+shared/grommunio/db-password
+shared/grommunio/db-password-again
+shared/grommunio/db-host
+shared/grommunio/db-name
+shared/grommunio/db-user
 '
 PKG_TEMPLATES='
 grommunio-pkg-bits/setup-options-select
@@ -29,7 +34,7 @@ setup_debconf_reset () {
 	db_fset grommunio-setup/setup-options-select seen "$SEEN_STATE"
 }
 
-setup_preseed () {
+setup_debconf_preseed () {
 	if [ -n "$GSETUP_OPT_SELECT" ]; then
 		setup_debconf_reset 'true'
 	else
