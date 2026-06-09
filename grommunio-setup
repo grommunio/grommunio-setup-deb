@@ -1293,7 +1293,7 @@ chown -v grommunio /etc/grommunio-admin-common/license >>"${LOGFILE}" 2>&1
 progress 90
 writelog "Config stage: restart all required services"
 # shellcheck disable=SC2068
-systemctl restart saslauthd.service ${SERVICES[@]} 2>&1 | tee -a "${LOGFILE}"
+systemctl restart saslauthd.service ${SERVICES[@]} >>"${LOGFILE}" 2>&1 || true
 
 # grommunio-admin-api systemd-tmpfiles wrong user for nginx
 cp -v /usr/lib/tmpfiles.d/grommunio-admin-api.conf /etc/tmpfiles.d/
