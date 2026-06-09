@@ -115,6 +115,14 @@ if ! test -e "$LOGFILE"; then
 fi
 
 apt-get() {
+# Remove any stray '-y' as we re-add them below when needed
+local  clean_args=()
+for arg in "$@"; do
+  if [[ "$arg" != "-y" ]]; then
+    clean_args+=("$arg")
+  fi
+done
+set -- "${clean_args[@]}"
 if [ "$1" = "update" ]; then
   shift
   if ! command apt-get update -y "$@" >>"${LOGFILE}" 2>&1; then
@@ -612,7 +620,7 @@ PHPVER="$(apt-cache show php |awk '/^Depends:/ {sub("php","", $2);print$2}')"
 
 writelog "Config stage: enable all services"
 SERVICES=(redis-server@grommunio.service "php${PHPVER}-fpm.service" nginx.service
-$(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -v snapshot)
+$(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -Pv 'snapshot|cleaner')
   clamav-freshclam.service clamav-daemon.service rspamd.service)
 # shellcheck disable=SC2068
 systemctl enable ${SERVICES[@]} >>"${LOGFILE}" 2>&1
@@ -1285,7 +1293,7 @@ chown -v grommunio /etc/grommunio-admin-common/license >>"${LOGFILE}" 2>&1
 progress 90
 writelog "Config stage: restart all required services"
 # shellcheck disable=SC2068
-systemctl restart saslauthd.service ${SERVICES[@]} >>"${LOGFILE}" 2>&1
+systemctl restart saslauthd.service ${SERVICES[@]} 2>&1 | tee -a "${LOGFILE}"
 
 # grommunio-admin-api systemd-tmpfiles wrong user for nginx
 cp -v /usr/lib/tmpfiles.d/grommunio-admin-api.conf /etc/tmpfiles.d/
@@ -1304,7 +1312,7 @@ logs:
 EOF
 
 setup_options_debconf
-writelog "Config stage: Install optiona feature applications"
+writelog "Config stage: Install optional feature applications"
 progress 95
 
 # grommunio-admin-api add rspamd.service

@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.4.19) unstable; urgency=medium
+grommunio-setup-deb (1.4.20) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
@@ -9,8 +9,9 @@ grommunio-setup-deb (1.4.19) unstable; urgency=medium
   * Create setup_options_debconf() function to install optional
     feature packages.
   * Fix typo in grommunio-setup script with jq here document
+  * Fix issues with apt-get() function, service restart
 
- -- grommunio <dev@grommunio.com>  Tue, 09 Jun 2026 11:07:39 +1200
+ -- grommunio <dev@grommunio.com>  Tue, 09 Jun 2026 14:40:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 
