@@ -16,8 +16,9 @@ grommunio-setup-deb (1.4.26) unstable; urgency=medium
   * Rename setup_preseed() -> setup_debconf_preseed()
   * Fix calc_option_pkg_select() return value issues
   * Fix apt-get() (first iteration), add APT_EXTRA_ARGS variable
+  * Experiment with using apt instead of apt-get
 
- -- grommunio <dev@grommunio.com>  Mon, 15 Jun 2026 13:45:31 +1200
+ -- grommunio <dev@grommunio.com>  Mon, 15 Jun 2026 16:40:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 
