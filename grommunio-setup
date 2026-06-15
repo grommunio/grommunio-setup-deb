@@ -45,7 +45,7 @@ setup_options_debconf () {
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
 	[ -n "$PKG_FIRST" ] && install_packages ${PKG_FIRST}
 	sleep 3
-	APT_EXTRA_ARGS="-o DPkg::Pre-Install-Pkgs=\"dpkg-preconfigure --apt --priority=${GSETUP_PRIORITY}\""
+	APT_EXTRA_ARGS="-o DPkg::Pre-Install-Pkgs='dpkg-preconfigure --apt --priority=${GSETUP_PRIORITY}'"
 	install_packages ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
