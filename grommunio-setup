@@ -20,6 +20,7 @@ PROGNAME=`basename "$0"`
 
 setup_options_debconf () {
 	# Appliance setup script, behave like a Debian system
+	clear # clear screen
 	GSETUP_AUTO_CONFIG="true"
 	GSETUP_ADMIN_PASSWORD="$ADMIN_PASS"
 	GSETUP_SITE_FQDN="$FQDN"
@@ -44,6 +45,7 @@ setup_options_debconf () {
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
 	[ -n "$PKG_FIRST" ] && install_packages ${PKG_FIRST}
 	sleep 3
+	APT_EXTRA_ARGS="-o DPkg::Pre-Install-Pkgs=\"dpkg-preconfigure --apt --priority=${GSETUP_PRIORITY}\""
 	install_packages ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
@@ -132,7 +134,7 @@ done
 set -- "${clean_args[@]}"
 if [ "$1" = "update" ]; then
   shift
-  if ! command apt update ${APT_EXTRA_ARGS} -y "$@" 2>&1 |tee -a "${LOGFILE}" 2>&1; then
+  if ! command apt update ${APT_EXTRA_ARGS} -y "$@"; then
     echo "APT: Update failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${LOGFILE}"|tee -a "${LOGFILE}"
   fi
