@@ -112,6 +112,8 @@ else
   DATADIR="${DATADIR%/*}"
   DATADIR="$(readlink -f "${DATADIR}")"
 fi
+APT_EXTRA_ARGS='-qq'
+APT_LOGFILE="/var/log/apt/term.log"
 LOGFILE="/var/log/grommunio-setup.log"
 if ! test -e "$LOGFILE"; then
   true >"$LOGFILE"
@@ -129,21 +131,21 @@ done
 set -- "${clean_args[@]}"
 if [ "$1" = "update" ]; then
   shift
-  if ! command apt-get update -y "$@" >>"${LOGFILE}" 2>&1; then
+  if ! command apt-get update ${APT_EXTRA_ARGS} -y "$@" 2>&1 |tee -a "${LOGFILE}" 2>&1; then
     echo "APT: Update failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${LOGFILE}"|tee -a "${LOGFILE}"
   fi
 elif [ "$1" = "dist-upgrade" ]; then
   shift
-  if ! command apt-get dist-upgrade -y >>"${LOGFILE}" 2>&1; then
+  if ! command apt-get dist-upgrade ${APT_EXTRA_ARGS} -y; then
     echo "APT: Dist-Upgrade failed."|tee -a "${LOGFILE}"
-    echo "Please check the logfile: ${LOGFILE}"|tee -a "${LOGFILE}"
+    echo "Please check the logfile: ${APT_LOGFILE}"|tee -a "${LOGFILE}"
   fi
 elif [ "$1" = "install" ]; then
   shift
-  if ! command apt-get install -y "$@" >>"${LOGFILE}" 2>&1; then
+  if ! command apt-get install ${APT_EXTRA_ARGS} -y "$@"; then
     echo "APT: Installation encountered problems: ${*}." |tee -a "${LOGFILE}"
-    echo "Please check the logfile: ${LOGFILE}" |tee -a "${LOGFILE}"
+    echo "Please check the logfile: ${APT_LOGFILE}" |tee -a "${LOGFILE}"
   fi
 fi
 }
