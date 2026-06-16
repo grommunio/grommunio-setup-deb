@@ -138,7 +138,7 @@ if [ "$1" = "update" ]; then
   fi
 elif [ "$1" = "dist-upgrade" ]; then
   shift
-  if ! command apt-get dist-upgrade -qq -y >/dev/null " 2>&1; then
+  if ! command apt-get dist-upgrade -qq -y >/dev/null 2>&1; then
     echo "APT: Dist-Upgrade failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${APT_LOGFILE}"|tee -a "${LOGFILE}"
   fi
