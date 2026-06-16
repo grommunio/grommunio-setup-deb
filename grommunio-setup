@@ -42,9 +42,9 @@ setup_options_debconf () {
 	local PKG_FIRST=''
 	local PKG_SELECT=''
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
-	clear # clear screen
-	[ -n "$PKG_FIRST" ] && install_packages -yS -L "${LOGFILE}" ${PKG_FIRST}
+	[ -n "$PKG_FIRST" ] && install_packages -S -L "${LOGFILE}" ${PKG_FIRST}
 	sleep 3
+	clear # clear screen
 	install_packages -A ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
@@ -144,10 +144,11 @@ elif [ "$1" = "dist-upgrade" ]; then
   fi
 elif [ "$1" = "install" ]; then
   shift
-  if ! command apt install ${APT_EXTRA_ARGS} -y "$@" >/dev/null 2>&1; then
-    echo "APT: Installation encountered problems: ${*}." |tee -a "${LOGFILE}"
-    echo "Please check the logfile: ${APT_LOGFILE}" |tee -a "${LOGFILE}"
-  fi
+  install_packages -S -L "${LOGFILE}" "$@"
+  #if ! command apt install ${APT_EXTRA_ARGS} -y "$@" >/dev/null 2>&1; then
+  #  echo "APT: Installation encountered problems: ${*}." |tee -a "${LOGFILE}"
+  #  echo "Please check the logfile: ${APT_LOGFILE}" |tee -a "${LOGFILE}"
+  #fi
 fi
 }
 
