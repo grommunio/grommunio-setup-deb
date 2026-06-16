@@ -20,7 +20,6 @@ PROGNAME=`basename "$0"`
 
 setup_options_debconf () {
 	# Appliance setup script, behave like a Debian system
-	clear # clear screen
 	GSETUP_AUTO_CONFIG="true"
 	GSETUP_ADMIN_PASSWORD="$ADMIN_PASS"
 	GSETUP_SITE_FQDN="$FQDN"
@@ -43,9 +42,10 @@ setup_options_debconf () {
 	local PKG_FIRST=''
 	local PKG_SELECT=''
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
-	[ -n "$PKG_FIRST" ] && install_packages -A ${PKG_FIRST}
+	clear # clear screen
+	[ -n "$PKG_FIRST" ] && install_packages -yS -L "${LOGFILE}" ${PKG_FIRST}
 	sleep 3
-	install_packages -A -P ${PKG_SELECT}
+	install_packages -AP ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
 
