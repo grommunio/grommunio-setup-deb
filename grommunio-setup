@@ -43,9 +43,9 @@ setup_options_debconf () {
 	local PKG_FIRST=''
 	local PKG_SELECT=''
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
-	[ -n "$PKG_FIRST" ] && install_packages ${PKG_FIRST}
+	[ -n "$PKG_FIRST" ] && install_packages -A ${PKG_FIRST}
 	sleep 3
-	install_packages ${PKG_SELECT}
+	install_packages -A -P ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
 
