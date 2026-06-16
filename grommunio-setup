@@ -45,7 +45,6 @@ setup_options_debconf () {
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
 	[ -n "$PKG_FIRST" ] && install_packages ${PKG_FIRST}
 	sleep 3
-	APT_EXTRA_ARGS="-o DPkg::Pre-Install-Pkgs='dpkg-preconfigure --apt --priority=${GSETUP_PRIORITY}'"
 	install_packages ${PKG_SELECT}
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
@@ -115,7 +114,6 @@ else
   DATADIR="$(readlink -f "${DATADIR}")"
 fi
 #APT_EXTRA_ARGS='-qq'
-APT_EXTRA_ARGS=''
 APT_LOGFILE="/var/log/apt/term.log"
 LOGFILE="/var/log/grommunio-setup.log"
 if ! test -e "$LOGFILE"; then
@@ -134,19 +132,19 @@ done
 set -- "${clean_args[@]}"
 if [ "$1" = "update" ]; then
   shift
-  if ! command apt update ${APT_EXTRA_ARGS} -y "$@"; then
+  if ! command apt-get update -qq -y "$@" >> "${LOGFILE}" 2>&1; then
     echo "APT: Update failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${LOGFILE}"|tee -a "${LOGFILE}"
   fi
 elif [ "$1" = "dist-upgrade" ]; then
   shift
-  if ! command apt dist-upgrade ${APT_EXTRA_ARGS} -y; then
+  if ! command apt-get dist-upgrade -qq -y >/dev/null " 2>&1; then
     echo "APT: Dist-Upgrade failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${APT_LOGFILE}"|tee -a "${LOGFILE}"
   fi
 elif [ "$1" = "install" ]; then
   shift
-  if ! command apt install ${APT_EXTRA_ARGS} -y "$@"; then
+  if ! command apt install ${APT_EXTRA_ARGS} -y "$@" >/dev/null 2>&1; then
     echo "APT: Installation encountered problems: ${*}." |tee -a "${LOGFILE}"
     echo "Please check the logfile: ${APT_LOGFILE}" |tee -a "${LOGFILE}"
   fi
