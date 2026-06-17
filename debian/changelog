@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.4.35) unstable; urgency=medium
+grommunio-setup-deb (1.5) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
@@ -15,13 +15,13 @@ grommunio-setup-deb (1.4.35) unstable; urgency=medium
   * Add missing debconf questions
   * Rename setup_preseed() -> setup_debconf_preseed()
   * Fix calc_option_pkg_select() return value issues
-  * Fix apt-get() (first iteration), add APT_EXTRA_ARGS variable
-  * Experiment with using apt instead of apt-get
-  * Fine tune apt
+  * Resolve and tame apt-get() - have command line arguments
   * Move to using revamped install_packages() function
   * Enable --quiet, more verbose progress by default
+  * Other command line arguments to preset values including admin
+    password and DB password
 
- -- grommunio <dev@grommunio.com>  Mon, 17 Jun 2026 14:22:00 +1200
+ -- grommunio <dev@grommunio.com>  Wed, 17 Jun 2026 17:08:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 
