@@ -672,8 +672,10 @@ if [ -e "/etc/php/$PHPVER/fpm/php-fpm.d/pool-grommunio-dav.conf" ] && [ ! -e "/e
   ln -vs "/etc/php/$PHPVER/fpm/php-fpm.d/pool-grommunio-dav.conf" "/etc/php/$PHPVER/fpm/pool.d/" >>"${LOGFILE}" 2>&1
 fi
 
-writelog "Remove default nginx host config"
-rm -vf /etc/nginx/sites-enabled/default >>"${LOGFILE}" 2>&1
+if [ -f /etc/nginx/sites-enabled/default-site.conf ]; then
+	writelog "Remove default nginx host config"
+	rm -vf /etc/nginx/sites-enabled/default-site.conf >>"${LOGFILE}" 2>&1
+fi
 
 writelog "Config stage: gromox config"
 setconf /etc/gromox/http.cfg listen_port 10080
