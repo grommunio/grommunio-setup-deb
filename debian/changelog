@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.4.34) unstable; urgency=medium
+grommunio-setup-deb (1.4.35) unstable; urgency=medium
 
   * Shift to obs_gbp packaging, create debian dir
   * add debconf template registration.
@@ -19,8 +19,9 @@ grommunio-setup-deb (1.4.34) unstable; urgency=medium
   * Experiment with using apt instead of apt-get
   * Fine tune apt
   * Move to using revamped install_packages() function
+  * Enable --quiet, more verbose progress by default
 
- -- grommunio <dev@grommunio.com>  Mon, 16 Jun 2026 21:16:00 +1200
+ -- grommunio <dev@grommunio.com>  Mon, 17 Jun 2026 14:22:00 +1200
 
 grommunio-setup-deb (1.2) unstable; urgency=medium
 

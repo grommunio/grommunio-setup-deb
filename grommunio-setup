@@ -51,7 +51,7 @@ setup_options_debconf () {
 
 grommunio_setup_usage () {
 	local BLAH="
-  $PROGNAME: [-abhDxX] [-f frontend] [-n db-name] [-p priority] [-q site-fqdn] [-t db-host] [-u db-user] [-s pkg-selection]
+  $PROGNAME: [-abDhqxX] [-f frontend] [-n db-name] [-p priority] [-t db-host] [-u db-user] [-s pkg-selection] [-z site-fqdn]
 
 "
 	echo -n "$BLAH" 1>&2
@@ -67,14 +67,15 @@ grommunio_setup_vusage () {
                                   priority or higher
          -f  --frontend           select debconf frontend to use
          -h  --help               print this help
-	 -n  --db-name            preseed the shared/grommunio/db-name setting
+         -n  --db-name            preseed the shared/grommunio/db-name setting
          -p  --priority           show questions of this priority or higher
-	 -q  --site-fqdn          preseed the site-fqdn debconf setting
+         -q  --quiet              quieter apt output, no progress info
          -s  --option-select      option packages to be operated on, comma separated
-	 -t  --db-host            preseed the shared/grommunio/db-host setting
-	 -u  --db-user            preseed the shared/grommunio/db-user setting
-	 -x  --repo-setup         setup up package repository definition
-	 -X  --no-repo-setup      don't setup package repository definition
+         -t  --db-host            preseed the shared/grommunio/db-host setting
+         -u  --db-user            preseed the shared/grommunio/db-user setting
+         -x  --repo-setup         setup up package repository definition
+         -X  --no-repo-setup      don't setup package repository definition
+         -z  --site-fqdn          preseed the site-fqdn debconf setting
 
          Debconf frontends available: 'dialog', 'readline', 'noninteractive',
                                       'gnome', 'kde', 'editor', 'web'
@@ -96,8 +97,8 @@ NO_APT_SETUP=0
 GSETUP_REPO_SETUP='true'
 [ $NO_APT_SETUP -ne 0 ] && GSETUP_REPO_SETUP='false'
 
-CMD_MODE='setup' CMD_SHORT_ARGS='abDhxXf:n:p:q:s:t:u:' \
-CMD_LONG_ARGS='admin-password,db-host:,db-name:,db-password,db-user:,no-def-priority,frontend:,help,,option-select:,priority:,repo-setup,no-repo-setup,site-fqdn:' \
+CMD_MODE='setup' CMD_SHORT_ARGS='abDhqxXf:n:p:s:t:u:z:' \
+CMD_LONG_ARGS='admin-password,db-host:,db-name:,db-password,db-user:,no-def-priority,frontend:,help,,option-select:,priority:,quiet,repo-setup,no-repo-setup,site-fqdn:' \
 grommunio_cmd_args "$@"
 
 # Establish lock file if first process
@@ -145,10 +146,6 @@ elif [ "$1" = "dist-upgrade" ]; then
 elif [ "$1" = "install" ]; then
   shift
   install_packages -S -L "${LOGFILE}" "$@"
-  #if ! command apt install ${APT_EXTRA_ARGS} -y "$@" >/dev/null 2>&1; then
-  #  echo "APT: Installation encountered problems: ${*}." |tee -a "${LOGFILE}"
-  #  echo "Please check the logfile: ${APT_LOGFILE}" |tee -a "${LOGFILE}"
-  #fi
 fi
 }
 
@@ -314,9 +311,13 @@ chown -Rfv groweb:groweb /var/lib/grommunio-web/{tmp,session} >>"${LOGFILE}" 2>&
 chown -Rfv groindex:groweb /var/lib/grommunio-web/sqlite-index >>"${LOGFILE}" 2>&1
 
 MYSQL_HOST="localhost"
+[ -n "$GSETUP_DB_HOST" ] && MYSQL_HOST="$GSETUP_DB_HOST"
 MYSQL_USER="grommunio"
-MYSQL_PASS="$(randpw)"
+[ -n "$GSETUP_DB_USER" ] && MYSQL_USER="$GSETUP_DB_USER"
 MYSQL_DB="grommunio"
+[ -n "$GSETUP_DB_NAME" ] && MYSQL_DB="$GSETUP_DB_NAME"
+MYSQL_PASS="$(randpw)"
+[ -n "$GSETUP_DB_PASSWORD" ] && MYSQL_PASS="$GSETUP_DB_PASSWORD"
 
 set_mysql_param() {
 
@@ -384,7 +385,11 @@ else
 fi
 writelog "MySQL configuration: Host: ${MYSQL_HOST}, User: ${MYSQL_USER}, Password: ${MYSQL_PASS}, Database: ${MYSQL_DB}"
 
-dialog_adminpass
+if [ -z "$GSETUP_ADMIN_PASSWORD" ]; then
+	dialog_adminpass
+else
+	ADMIN_PASS="$GSETUP_ADMIN_PASSWORD"
+fi
 
 set_fqdn() {
 
@@ -394,12 +399,15 @@ set_fqdn() {
 
 Example: grommunio.example.com
 
-This name will be part of the certificates later generated. / This name will have to be present in imported certificates." 0 0 "$(hostname -f)" 3>&1 1>&2 2>&3
+This name will be part of the certificates later generated. / This name will have to be present in imported certificates." 0 0 "$1" 3>&1 1>&2 2>&3
   dialog_exit $?
 
 }
 
-FQDN=$(set_fqdn)
+FQDN="$(hostname -f)"
+[ -n "$GSETUP_SITE_FQDN" ] && FQDN="$GSETUP_SITE_FQDN"
+FQDN=$(set_fqdn "$FQDN")
+
 # lower case FQDN, strip whitespace
 FQDN=$(echo "${FQDN,,}"|xargs)
 
