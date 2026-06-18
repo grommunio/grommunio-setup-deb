@@ -306,9 +306,6 @@ apt-get install -f
 # fix run directory for php-fpm
 echo "d /run/php-fpm 0755 www-data gromox - -" >/etc/tmpfiles.d/run-php-fpm.conf
 systemd-tmpfiles --create >>"${LOGFILE}" 2>&1
-# fix folder permissions
-chown -Rfv groweb:groweb /var/lib/grommunio-web/{tmp,session} >>"${LOGFILE}" 2>&1
-chown -Rfv groindex:groweb /var/lib/grommunio-web/sqlite-index >>"${LOGFILE}" 2>&1
 
 MYSQL_HOST="localhost"
 [ -n "$GSETUP_DB_HOST" ] && MYSQL_HOST="$GSETUP_DB_HOST"
@@ -1280,16 +1277,6 @@ if ! /lib/systemd/systemd-sysv-install is-enabled saslauthd; then
 fi
 systemctl start saslauthd  >>"${LOGFILE}" 2>&1
 
-writelog "Fix log folder rights"
-{
-chmod -Rfv u=rwX,g=rwX,o=-rwx /var/log/grommunio-dav /var/log/grommunio-sync
-chown -Rfv grosync:grosync /var/log/grommunio-sync
-chown -Rfv grodav:grodav /var/log/grommunio-dav
-chmod -Rfv u=rwX,g=rX,o=-rwx /etc/gromox
-chown -Rfv grommunio:gromoxcf /etc/gromox
-chown -Rfv grommunio:gromox /var/lib/grommunio-admin-api
-} >>"${LOGFILE}" 2>&1
-
 writelog "Enable fetchmail and configure"
 setconf /etc/default/fetchmail START_DAEMON yes
 systemctl enable --now fetchmail.service >>"${LOGFILE}" 2>&1
@@ -1309,9 +1296,6 @@ writelog "Config stage: open required firewall ports"
   firewall-cmd --add-port=8443/tcp --zone=public --permanent
   firewall-cmd --reload
 } >>"${LOGFILE}" 2>&1
-
-writelog "Fix license import via admin-web-gui"
-chown -v grommunio /etc/grommunio-admin-common/license >>"${LOGFILE}" 2>&1
 
 progress 90
 writelog "Config stage: restart all required services"
