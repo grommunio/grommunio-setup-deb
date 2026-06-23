@@ -88,13 +88,12 @@ letsencrypt() {
   [ -e "/etc/nginx/conf.d/grommunio.conf" ] && mv "/etc/nginx/conf.d/grommunio.conf" "/etc/nginx/conf.d/grommunio.conf.grommunio-setup"
 
   progress 75
-  certbot certonly -n --nginx --agree-tos \
+  if ! certbot certonly -n --nginx --agree-tos \
     --preferred-challenges http \
     --cert-name="${FQDN}" \
     -d "${SSL_DOMAINS}" \
-    -m "${SSL_EMAIL}" >>"${LOGFILE}" 2>&1
+    -m "${SSL_EMAIL}" >>"${LOGFILE}" 2>&1; then
 
-  if [ "$?" != "0" ]; then
     dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
            --title "TLS certificate (Let's Encrypt)" \
            --yes-label "OK" --no-label "Exit" --defaultno \

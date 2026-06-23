@@ -1,3 +1,9 @@
+grommunio-setup-deb (1.5.4) stable; urgency=medium
+
+  * Fix error processing for LE certificates 
+
+ -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 11:13:20 +1200
+
 grommunio-setup-deb (1.5.3) stable; urgency=medium
 
   * Add veersioned dependency on grommunio-pkg-bits, at least ver 20
