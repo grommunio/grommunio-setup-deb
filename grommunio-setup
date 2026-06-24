@@ -346,10 +346,10 @@ if [ "${MYSQL_INSTALL_TYPE}" = "2" ]; then
     MYSQL_PASS=$(sed -n '3{p;q}' "${TMPF}")
     MYSQL_DB=$(sed -n '4{p;q}' "${TMPF}")
     if [ -n "${MYSQL_HOST}" ] && [ -n "${MYSQL_USER}" ] && [ -z "${MYSQL_PASS}" ] && [ -n "${MYSQL_DB}" ]; then
-      echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" "${MYSQL_DB}" >/dev/null 2>&1
+      echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" "${MYSQL_DB}" >/dev/null 2>&1 && RETCMD=$? || RETCMD=$?
       writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} ${MYSQL_DB}"
     elif [ -n "${MYSQL_HOST}" ] && [ -n "${MYSQL_USER}" ] && [ -n "${MYSQL_PASS}" ] && [ -n "${MYSQL_DB}" ]; then
-      echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASS}" "${MYSQL_DB}" >/dev/null 2>&1
+      echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASS}" "${MYSQL_DB}" >/dev/null 2>&1 && RETCMD=$? || RETCMD=$?
       writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASS} ${MYSQL_DB}"
     else
       failonme 1 && RETCMD=$? || RETCMD=$?
@@ -367,7 +367,7 @@ else
     MYSQL_PASS=$(sed -n '3{p;q}' "${TMPF}")
     MYSQL_DB=$(sed -n '4{p;q}' "${TMPF}")
     if [ -n "${MYSQL_HOST}" ] && [ -n "${MYSQL_USER}" ] && [ -n "${MYSQL_PASS}" ] && [ -n "${MYSQL_DB}" ]; then
-      echo "DROP DATABASE IF EXISTS ${MYSQL_DB}; CREATE DATABASE ${MYSQL_DB}; GRANT ALL ON ${MYSQL_DB}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}';" | mysql >/dev/null 2>&1
+      echo "DROP DATABASE IF EXISTS ${MYSQL_DB}; CREATE DATABASE ${MYSQL_DB}; GRANT ALL ON ${MYSQL_DB}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}';" | mysql >/dev/null 2>&1 && RETCMD=$? || RETCMD=$?
     else
       failonme 1 && RETCMD=$? || RETCMD=$?
     fi
