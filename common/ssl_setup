@@ -76,10 +76,11 @@ owncert() {
 }
 
 letsencrypt() {
+  local PROG_MSG="grommunio Setup is getting a Let's Encrypt certificate..."
 
-  progress 0
+  progress 0 "$PROG_MSG"
   apt-get install -y python3-yaml python3-certbot python3-certbot-nginx nginx >>"${LOGFILE}" 2>&1
-  progress 60
+  progress 60 "$PROG_MSG"
   {
     firewall-cmd --add-port=80/tcp --zone=public --permanent
     firewall-cmd --add-service=https --zone=public --permanent
@@ -88,7 +89,7 @@ letsencrypt() {
 
   [ -e "/etc/nginx/conf.d/grommunio.conf" ] && mv "/etc/nginx/conf.d/grommunio.conf" "/etc/nginx/conf.d/grommunio.conf.grommunio-setup"
 
-  progress 75
+  progress 75 "$PROG_MSG"
   if ! certbot certonly -n --nginx --agree-tos \
     --preferred-challenges http \
     --cert-name="${FQDN}" \
@@ -103,7 +104,7 @@ letsencrypt() {
     dialog_exit $DIALOG_CANCEL
   fi
 
-  progress 95
+  progress 95 "$PROG_MSG"
 
   [ -e "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" ] && mv "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" "/etc/nginx/conf.d/grommunio.conf"
 

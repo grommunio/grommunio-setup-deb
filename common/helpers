@@ -111,8 +111,12 @@ Enjoy grommunio!"
 }
 
 progress() {
+  local MSG='grommunio Setup is preparing the system...'
+  if [ -n "$2" ]; then
+    MSG="$2"
+  fi
 
-  echo "$1" | dialog --backtitle "grommunio Setup in progress" --title "Configuring" --gauge "   grommunio Setup is preparing the system..." 6 50
+  echo "$1" | dialog --backtitle "grommunio Setup in progress" --title "Configuring" --gauge "   ${MSG}" 6 50
 
 }
 

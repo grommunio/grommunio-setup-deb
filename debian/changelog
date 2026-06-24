@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.5.7) stable; urgency=medium
+grommunio-setup-deb (1.5.8) stable; urgency=medium
 
   * Fix error processing for LE certificates
   * Fix error processing for '$?' as set -e is turned on.
@@ -7,8 +7,9 @@ grommunio-setup-deb (1.5.7) stable; urgency=medium
   * Make LE error dialog only have 'Exit' as proceeding any further
     without any certificates installed is just going to be a mess, and
     probably error out futher into the setup.
+  * Fix LE certificate progress messages.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 18:03:20 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 19:05:20 +1200
 
 grommunio-setup-deb (1.5.3) stable; urgency=medium
 
