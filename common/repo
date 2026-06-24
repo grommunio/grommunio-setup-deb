@@ -174,8 +174,7 @@ repos_main () {
 		exit 1
 	fi
 
-	setup_repo
-	RETVAL=$?
+	setup_repo && RETVAL=$? || RETVAL=$?
 	if [ $RETVAL -ne 0 ]; then
 		echo "${PROGNAME}: grommunio apt repository definitions already exist"
 		exit $RETVAL

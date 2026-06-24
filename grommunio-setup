@@ -202,8 +202,8 @@ if [ -e "/etc/grommunio-common/setup_done" ]; then
 You can abort or delete all data and setup everything from scratch. If so, confirm this operation by typing "removealldata" to continue.
 
 \Z1If you continue, ALL data wil be removed!\Z1' \
-    0 0 3>&1 1>&2 2>&3)
-  dialog_exit $?
+    0 0 3>&1 1>&2 2>&3) && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
   if [ "${DELCONFIRM}" != "removealldata" ]; then
     writelog "Aborted deletion after detected existing installation"
     exit 0
@@ -276,8 +276,7 @@ PACKAGES=(gromox grommunio-admin-api grommunio-admin-web grommunio-index
   grommunio-dav grommunio-dbconf nginx-module-vts)
 . "${DATADIR}/common/repo"
 if [ "$GSETUP_REPO_SETUP" = 'true' ]; then
-  setup_repo
-  if [ $? -ne 0 ]; then
+  if ! setup_repo ; then
     writelog "Exiting - trying to set up apt repos when already defined"
     apt_already_setup_notice
     clear
@@ -324,8 +323,8 @@ set_mysql_param() {
     "Host:    " 1 1 "${MYSQL_HOST}" 1 17 25 0 \
     "User:    " 2 1 "${MYSQL_USER}" 2 17 25 0 \
     "Password:" 3 1 "${MYSQL_PASS}" 3 17 25 0 \
-    "Database:" 4 1 "${MYSQL_DB}" 4 17 25 0 2>"${TMPF}"
-  dialog_exit $?
+    "Database:" 4 1 "${MYSQL_DB}" 4 17 25 0 2>"${TMPF}" && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -333,8 +332,8 @@ writelog "Dialog: mysql installation type"
 MYSQL_INSTALL_TYPE=$(dialog --no-mouse --colors --backtitle "grommunio Setup" --title "grommunio Setup: Database" \
   --menu "Choose database setup type" 0 0 0 \
   "1" "Create database locally (default)" \
-  "2" "Connect to existing database (advanced users)" 3>&1 1>&2 2>&3)
-dialog_exit $?
+  "2" "Connect to existing database (advanced users)" 3>&1 1>&2 2>&3) && STATUS=$? || STATUS=$?
+dialog_exit $STATUS
 
 writelog "Selected MySQL installation type: ${MYSQL_INSTALL_TYPE}"
 
@@ -353,12 +352,11 @@ if [ "${MYSQL_INSTALL_TYPE}" = "2" ]; then
       echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASS}" "${MYSQL_DB}" >/dev/null 2>&1
       writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASS} ${MYSQL_DB}"
     else
-      failonme 1
+      failonme 1 && RETCMD=$? || RETCMD=$?
     fi
-    RETCMD=$?
     if [ ${RETCMD} -ne 0 ]; then
-      dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "MySQL database credentials" --msgbox 'No connection could be established with the database using the provided credentials. Verify that the credentials are correct and that a connection to the database is possible from this system.' 0 0
-      dialog_exit $?
+      dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "MySQL database credentials" --msgbox 'No connection could be established with the database using the provided credentials. Verify that the credentials are correct and that a connection to the database is possible from this system.' 0 0 && STATUS=$? || STATUS=$?
+      dialog_exit $STATUS
     fi
   done
 else
@@ -371,12 +369,11 @@ else
     if [ -n "${MYSQL_HOST}" ] && [ -n "${MYSQL_USER}" ] && [ -n "${MYSQL_PASS}" ] && [ -n "${MYSQL_DB}" ]; then
       echo "DROP DATABASE IF EXISTS ${MYSQL_DB}; CREATE DATABASE ${MYSQL_DB}; GRANT ALL ON ${MYSQL_DB}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}';" | mysql >/dev/null 2>&1
     else
-      failonme 1
+      failonme 1 && RETCMD=$? || RETCMD=$?
     fi
-    RETCMD=$?
     if [ ${RETCMD} -ne 0 ]; then
-      dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "MySQL connection failed" --msgbox 'Could not set up the database. Make sure it is reachable and re-run the creation process.' 0 0
-      dialog_exit $?
+      dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "MySQL connection failed" --msgbox 'Could not set up the database. Make sure it is reachable and re-run the creation process.' 0 0 && STATUS=$? || STATUS=$?
+      dialog_exit $STATUS
     fi
   done
 fi
@@ -396,8 +393,9 @@ set_fqdn() {
 
 Example: grommunio.example.com
 
-This name will be part of the certificates later generated. / This name will have to be present in imported certificates." 0 0 "$1" 3>&1 1>&2 2>&3
-  dialog_exit $?
+This name will be part of the certificates later generated. / This name will have to be present in imported certificates." 0 0 "$1" 3>&1 1>&2 2>&3 \
+	&& STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -410,8 +408,8 @@ FQDN=$(echo "${FQDN,,}"|xargs)
 
 while [[ ${FQDN} =~ / ]]; do
   dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "Fully Qualified Domain Name (FQDN)" --msgbox 'The FQDN is invalid. Enter a valid FQDN.' 0 0
-  FQDN=$(set_fqdn)
-  dialog_exit $?
+  FQDN=$(set_fqdn) && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
   # lower case FQDN, strip whitespace
   FQDN=$(echo "${FQDN,,}"|xargs)
 done
@@ -427,8 +425,9 @@ set_maildomain() {
   dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "Mail domain" --cr-wrap --inputbox \
     "Tell us the default mail domain this system serves up. This is used, for example, for Non-Delivery Reports and for generation of some simple TLS certificates. Specify ONLY ONE domain here.
 
-Example: example.com" 0 0 "${DFL}" 3>&1 1>&2 2>&3
-  dialog_exit $?
+Example: example.com" 0 0 "${DFL}" 3>&1 1>&2 2>&3 \
+	&& STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -436,8 +435,9 @@ ORIGDOMAIN=$(set_maildomain)
 DOMAIN=${ORIGDOMAIN,,}
 
 while [[ ${DOMAIN} =~ / ]]; do
-  dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "Mail domain" --msgbox 'The entered mail domain is invalid. Enter a valid mail domain.' 0 0
-  dialog_exit $?
+  dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "Mail domain" --msgbox 'The entered mail domain is invalid. Enter a valid mail domain.' 0 0 \
+	  && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
   ORIGDOMAIN=$(set_maildomain)
   DOMAIN=${ORIGDOMAIN,,}
 done
@@ -465,8 +465,9 @@ choose_ssl_install_type() {
     "0" "Create self-signed certificate" \
     "1" "Create own CA and certificate" \
     "2" "Import an existing TLS certificate from files" \
-    "3" "Automatically generate Let's Encrypt certificate" 3>&1 1>&2 2>&3)
-  dialog_exit $?
+    "3" "Automatically generate Let's Encrypt certificate" 3>&1 1>&2 2>&3) \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -493,8 +494,9 @@ choose_ssl_fullca() {
     "Organization:   " 4 1 "${SSL_ORG}" 4 17 25 0 \
     "Org Unit:       " 5 1 "${SSL_OU}" 5 17 25 0 \
     "E-Mail:         " 6 1 "${SSL_EMAIL}" 6 17 25 0 \
-    "Validity (days):" 7 1 "${SSL_DAYS}" 7 17 25 0 2>"${TMPF}"
-  dialog_exit $?
+    "Validity (days):" 7 1 "${SSL_DAYS}" 7 17 25 0 2>"${TMPF}" \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -504,8 +506,9 @@ choose_ssl_selfprovided() {
   dialog --no-mouse --colors --backtitle "grommunio Setup" --title "TLS certificate (self-provided)" --ok-label "Submit" \
     --form "Enter the paths to the TLS certificates" 0 0 0 \
     "PEM encoded certificate bundle:  " 1 1 "${SSL_BUNDLE}" 1 35 120 0 \
-    "PEM encoded private key:         " 2 1 "${SSL_KEY}" 2 35 120 0 2>"${TMPF}"
-  dialog_exit $?
+    "PEM encoded private key:         " 2 1 "${SSL_KEY}" 2 35 120 0 2>"${TMPF}" \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -515,8 +518,9 @@ set_letsencryptmail() {
   dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's Encrypt)" --cr-wrap --inputbox \
     "Specify an email adress that Let's Encrypt can contact for when there is an issue with the certificates
 
-Example: ${SSL_EMAIL}" 0 0 "${SSL_EMAIL}" 3>&1 1>&2 2>&3
-  dialog_exit $?
+Example: ${SSL_EMAIL}" 0 0 "${SSL_EMAIL}" 3>&1 1>&2 2>&3 \
+	&& STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -529,24 +533,26 @@ choose_ssl_letsencrypt() {
       --checklist "Choose the Let's Encrypt certificates to request.\nBy requesting certificates from Let's Encrypt, you agree to the terms of service at ${LE_TERMS_URL}.\nThe DNS records should be set accordingly before proceeding." 0 0 0 \
       "${DOMAIN}" "recommended" on \
       "autodiscover.${DOMAIN}" "recommended" on \
-      "mail.${DOMAIN}" "optional" off 2>"${TMPF}"
+      "mail.${DOMAIN}" "optional" off 2>"${TMPF}" \
+      	|| dialog_exit $?
   else
     if [ "${FQDN}" = "mail.${DOMAIN}" ]; then
       dialog --no-mouse --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's Encrypt)" --ok-label "Submit" \
         --checklist "Choose the Let's Encrypt certificates to request.\nBy requesting certificates from Let's Encrypt, you agree to the terms of service at ${LE_TERMS_URL}.\nThe DNS records should be set accordingly before proceeding." 0 0 0 \
         "${DOMAIN}" "recommended" on \
         "${FQDN}" "recommended" on \
-        "autodiscover.${DOMAIN}" "recommended" off 2>"${TMPF}"
+        "autodiscover.${DOMAIN}" "recommended" off 2>"${TMPF}" \
+	  || dialog_exit $?
     else
       dialog --no-mouse --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's Encrypt)" --ok-label "Submit" \
         --checklist "Choose the Let's Encrypt certificates to request.\nBy requesting certificates from Let's Encrypt, you agree to the terms of service at ${LE_TERMS_URL}.\nThe DNS records should be set accordingly before proceeding." 0 0 0 \
         "${DOMAIN}" "recommended" on \
         "autodiscover.${DOMAIN}" "recommended" on \
         "${FQDN}" "recommended" on \
-        "mail.${DOMAIN}" "optional" off 2>"${TMPF}"
+        "mail.${DOMAIN}" "optional" off 2>"${TMPF}" \
+	  || dialog_exit $?
     fi
   fi
-  dialog_exit $?
 
 }
 
@@ -556,8 +562,9 @@ RETCMD=1
 if [ "${SSL_INSTALL_TYPE}" = "0" ]; then
   clear
   if ! selfcert; then
-    dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (self-signed)" --msgbox "Certificate generation not successful. See ${LOGFILE}.\nContinue installation or press ESC to abort setup." 0 0
-    dialog_exit $?
+    dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (self-signed)" --msgbox "Certificate generation not successful. See ${LOGFILE}.\nContinue installation or press ESC to abort setup." 0 0 \
+	    && STATUS=$? || STATUS=$?
+    dialog_exit $STATUS
   fi
 elif [ "${SSL_INSTALL_TYPE}" = "1" ]; then
   while [ -z "${SSL_COUNTRY}" ] || [ -z "${SSL_STATE}" ] || [ -z "${SSL_LOCALITY}" ] || [ -z "${SSL_ORG}" ] || [ -z "${SSL_OU}" ] || [ -z "${SSL_EMAIL}" ] || [ -z "${SSL_DAYS}" ] || [ "${RETCMD}" = "1" ]; do
@@ -577,17 +584,17 @@ elif [ "${SSL_INSTALL_TYPE}" = "2" ]; then
   choose_ssl_selfprovided
   SSL_BUNDLE=$(sed -n '1{p;q}' "${TMPF}")
   SSL_KEY=$(sed -n '2{p;q}' "${TMPF}")
-  while [ ${RETCMD} -ne 0 ]; do
-    owncert
-    RETCMD=$?
+  while ! owncert; do
+	  echo -n
   done
   writelog "TLS configuration: Bundle: ${SSL_BUNDLE} Key: ${SSL_KEY}"
 elif [ "${SSL_INSTALL_TYPE}" = "3" ]; then
   choose_ssl_letsencrypt
   SSL_DOMAINS=$(sed 's# #,#g' "${TMPF}" | tr '[:upper:]' '[:lower:]')
   while [ -z "${SSL_DOMAINS}" ]; do
-    dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's encrypt)" --msgbox "No valid domains have been chosen for the TLS certificates. Select valid domains." 0 0
-    dialog_exit $?
+    dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's encrypt)" --msgbox "No valid domains have been chosen for the TLS certificates. Select valid domains." 0 0 \
+      && STATUS=$? || STATUS=$?
+    dialog_exit $STATUS
     choose_ssl_letsencrypt
     SSL_DOMAINS=$(sed 's# #,#g' "${TMPF}" | tr '[:upper:]' '[:lower:]')
   done
@@ -595,8 +602,9 @@ elif [ "${SSL_INSTALL_TYPE}" = "3" ]; then
   SSL_EMAIL=$(set_letsencryptmail)
   while ! [[ ${SSL_EMAIL} =~ ^.*\@.*$ ]]; do
     dialog --no-mouse --clear --colors --backtitle "grommunio Setup" --title "TLS certificate (Let's Encrypt)" --msgbox "The provided email address is invalid. Enter a valid email address." 0 0
-    SSL_EMAIL=$(set_letsencryptmail)
-    dialog_exit $?
+    SSL_EMAIL=$(set_letsencryptmail) \
+    && STATUS=$? || STATUS=$?
+    dialog_exit $STATUS
   done
   letsencrypt
   writelog "TLS configuration: Let's Encrypt ${SSL_EMAIL}"

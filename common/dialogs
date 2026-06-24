@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-FileCopyrightText: 2021 grommunio GmbH
 
-dialog >/dev/null 2>&1
-if [ "$?" -eq 127 ]; then
+dialog >/dev/null 2>&1 && STATUS=$? || STATUS=$?
+if [ "$STATUS" -eq 127 ]; then
 	echo ERROR: /usr/bin/dialog not installed
 	exit 1
 fi
@@ -29,8 +29,9 @@ dialog_welcome () {
     --title "Welcome" \
     --yes-label "Continue" \
     --no-label "Cancel" --defaultno \
-    --yesno "${WELCOME_MSG}" 0 0
-  dialog_exit $?
+    --yesno "${WELCOME_MSG}" 0 0 \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -40,8 +41,9 @@ memory_notice ()
   dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
          --title "Memory requirements" \
          --yes-label "Ignore" --no-label "Exit" --defaultno \
-         --yesno "Minus the regions reserved by firmware or the operating system kernel, this system appears to have only $1 megabytes of memory available. Running with less than 4000 MB is not advised and may lead to processes being unable to perform or startup altogether." 0 0
-  dialog_exit $?
+         --yesno "Minus the regions reserved by firmware or the operating system kernel, this system appears to have only $1 megabytes of memory available. Running with less than 4000 MB is not advised and may lead to processes being unable to perform or startup altogether." 0 0 \
+	 && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -60,16 +62,17 @@ dialog_adminpass() {
     --passwordform         "${ADMINPASS_MSG}" 0 0 0 \
       "Password:     " 1 1 "${ADMIN_AUTO_PW}" 1 17 25 0 \
       "Confirmation: " 2 1 "${ADMIN_AUTO_PW}" 2 17 25 0 \
-    2>"${TMPF}"
-  dialog_exit $?
+    2>"${TMPF}" && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
   PASSONE=$(sed -n '1{p;q}' "${TMPF}")
   PASSTWO=$(sed -n '2{p;q}' "${TMPF}")
   if [ "${PASSONE}" != "${PASSTWO}" ] || [ -z "${PASSONE}" ] ; then
     dialog --no-mouse --clear --colors \
       --backtitle "grommunio Setup" \
       --title "Administrator password" \
-      --msgbox 'The passwords were either empty or not identical. Re-enter and confirm the password accordingly.' 0 0
-    dialog_exit $?
+      --msgbox 'The passwords were either empty or not identical. Re-enter and confirm the password accordingly.' 0 0 \
+      && STATUS=$? || STATUS=$?
+    dialog_exit $STATUS
     dialog_adminpass
   else
     ADMIN_PASS=${PASSTWO}
@@ -90,8 +93,9 @@ get_relayhost(){
   dialog --no-mouse --clear --colors --cr-wrap \
     --backtitle "grommunio Setup" \
     --title "Postfix relayhost" \
-    --inputbox "${RELAYHOST_MSG}" 0 0 "" 3>&1 1>&2 2>&3
-  dialog_exit $?
+    --inputbox "${RELAYHOST_MSG}" 0 0 "" 3>&1 1>&2 2>&3 \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }
 
@@ -100,7 +104,8 @@ apt_already_setup_notice ()
 
   dialog --no-mouse --colors --clear --backtitle "grommunio Setup" \
          --title "Apt already setup" \
-	 --msgbox 'It looks like a grommunio apt respository is already defined. Clear these settings, or use the --no-apt-setup flag to run grommunio-setup.' 0 0
-  dialog_exit $?
+	 --msgbox 'It looks like a grommunio apt respository is already defined. Clear these settings, or use the --no-apt-setup flag to run grommunio-setup.' 0 0 \
+	 && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
 }

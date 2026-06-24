@@ -34,8 +34,9 @@ On that dialog, you must choose \"View Certificate\" and explicitly install the 
     --title "TLS certificate (self-signed)" \
     --yes-label "Continue" \
     --no-label "Cancel" \
-    --yesno "${SELFCERT_MSG}" 0 0
-  dialog_exit $?
+    --yesno "${SELFCERT_MSG}" 0 0 \
+    && STATUS=$? || STATUS=$?
+  dialog_exit $STATUS
 
   openssl req -x509 -new -nodes -out "${SSL_BUNDLE_T}" -keyout "${SSL_KEY_T}" \
           -subj "/CN=${FQDN}" -addext "subjectAltName = DNS:${FQDN}, DNS:autodiscover.${DOMAIN}" >>"${LOGFILE}" 2>&1
@@ -97,8 +98,9 @@ letsencrypt() {
     dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
            --title "TLS certificate (Let's Encrypt)" \
            --yes-label "OK" --no-label "Exit" --defaultno \
-           --yesno "It seems the Let's Encrypt certificate could not be generated correctly. Verify the generation of the certificate under /var/log/letsencrypt and re-run.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\nAlternatively, re-run grommunio-setup to run through the process again." 0 0
-    dialog_exit $?
+           --yesno "It seems the Let's Encrypt certificate could not be generated correctly. Verify the generation of the certificate under /var/log/letsencrypt and re-run.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\nAlternatively, re-run grommunio-setup to run through the process again." 0 0 \
+	   && STATUS=$? || STATUS=$?
+    dialog_exit $STATUS
   fi
 
   progress 95

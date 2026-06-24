@@ -1,8 +1,9 @@
-grommunio-setup-deb (1.5.4) stable; urgency=medium
+grommunio-setup-deb (1.5.5) stable; urgency=medium
 
-  * Fix error processing for LE certificates 
+  * Fix error processing for LE certificates
+  * Fix error processing for '$?' as set -e is turned on.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 11:13:20 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 13:16:20 +1200
 
 grommunio-setup-deb (1.5.3) stable; urgency=medium
 
