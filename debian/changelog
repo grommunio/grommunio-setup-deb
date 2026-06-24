@@ -1,5 +1,6 @@
 grommunio-setup-deb (1.5.9) stable; urgency=medium
 
+  * Release 1.6
   * Fix error processing for LE certificates
   * Fix error processing for '$?' as set -e is turned on.
   * Add 'set -e' so that g-setup exits on any errors, rether than
@@ -9,7 +10,7 @@ grommunio-setup-deb (1.5.9) stable; urgency=medium
     probably error out futher into the setup.
   * Fix LE certificate progress messages.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 19:05:20 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Wed, 24 Jun 2026 19:30:00 +1200
 
 grommunio-setup-deb (1.5.3) stable; urgency=medium
 
