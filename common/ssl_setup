@@ -97,10 +97,10 @@ letsencrypt() {
 
     dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
            --title "TLS certificate (Let's Encrypt)" \
-           --yes-label "OK" --no-label "Exit" --defaultno \
-           --yesno "It seems the Let's Encrypt certificate could not be generated correctly. Verify the generation of the certificate under /var/log/letsencrypt and re-run.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\nAlternatively, re-run grommunio-setup to run through the process again." 0 0 \
+           --ok-label "Exit" \
+           --msgbox "It seems the Let's Encrypt certificate could not be generated correctly. Verify the generation of the certificate under /var/log/letsencrypt and re-run.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\nAlternatively, re-run grommunio-setup to run through the process again." 0 0 \
 	   && STATUS=$? || STATUS=$?
-    dialog_exit $STATUS
+    dialog_exit $DIALOG_CANCEL
   fi
 
   progress 95
