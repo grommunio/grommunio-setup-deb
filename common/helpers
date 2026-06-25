@@ -106,6 +106,7 @@ If using grommunio commercially, consider purchasing a subscription which provid
 Enjoy grommunio!"
 
   dialog --no-mouse --colors --backtitle "grommunio Setup completed" --title "Finish" --clear --ok-label "Quit" --msgbox "${FINISH_MSG}" 0 0
+  clear
   exit 0
 
 }

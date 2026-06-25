@@ -1387,5 +1387,4 @@ apt-get install -f
 progress 100
 writelog "Config stage: completed"
 setup_done
-# clear screen
-clear
+
