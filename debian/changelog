@@ -1,3 +1,13 @@
+grommunio-setup-deb (1.6.2) stable; urgency=medium
+
+  * Display welcome message earlier before any dependencies such as nginx
+    etc are installed.
+  * Open out certbot /etc/letsencrypt directory perms so that things work.
+  * Add paragraph to optional features dialog so that its obvious it
+    does not affect the core crommunio appliance install.
+
+ -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 26 Jun 2026 09:47:09 +1200
+
 grommunio-setup-deb (1.6.1) stable; urgency=medium
 
   * Add ACME server URL arg for setting Lets Encrypt server URL
