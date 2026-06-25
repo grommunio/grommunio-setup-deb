@@ -64,6 +64,7 @@ grommunio_setup_vusage () {
 	local BLAH="
          -a  --admin-password     Prompt for admin password via /dev/tty
                                   Set GSETUP_ADMIN_PASSWORD to bypass this.
+             --acme-server-url    Set the ACME server URL for Lets Encrypt certbot
          -b  --db-password        Prompt for grommunio DB password via /dev/tty
                                   Set GSETUP_DB_PASSWORD to bypass this.
          -D  --no-def-priority    Show all questions, not just default debconf
@@ -101,7 +102,7 @@ GSETUP_REPO_SETUP='true'
 [ $NO_APT_SETUP -ne 0 ] && GSETUP_REPO_SETUP='false'
 
 CMD_MODE='setup' CMD_SHORT_ARGS='abDhqxXf:n:p:s:t:u:z:' \
-CMD_LONG_ARGS='admin-password,db-host:,db-name:,db-password,db-user:,no-def-priority,frontend:,help,,option-select:,priority:,quiet,repo-setup,no-repo-setup,site-fqdn:' \
+CMD_LONG_ARGS='admin-password,acme-server-url:,db-host:,db-name:,db-password,db-user:,no-def-priority,frontend:,help,,option-select:,priority:,quiet,repo-setup,no-repo-setup,site-fqdn:' \
 grommunio_cmd_args "$@"
 
 # Establish lock file if first process

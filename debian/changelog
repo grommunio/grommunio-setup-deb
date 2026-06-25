@@ -1,4 +1,10 @@
-grommunio-setup-deb (1.5.9) stable; urgency=medium
+grommunio-setup-deb (1.6.1) stable; urgency=medium
+
+  * Add ACME server URL arg for setting Lets Encrypt server URL
+
+ -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 25 Jun 2026 13:01:28 +1200
+
+grommunio-setup-deb (1.6) stable; urgency=medium
 
   * Release 1.6
   * Fix error processing for LE certificates

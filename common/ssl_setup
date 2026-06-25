@@ -77,6 +77,11 @@ owncert() {
 
 letsencrypt() {
   local PROG_MSG="Getting a Let's Encrypt certificate..."
+  local SERVER_ARGS=''
+
+  if [ -n "$GSETUP_ACME_SERVER_URL" ]; then
+	  SERVER_ARGS="--server ${GSETUP_ACME_SERVER_URL}"
+  fi
 
   progress 0 "$PROG_MSG"
   apt-get install -y python3-yaml python3-certbot python3-certbot-nginx nginx >>"${LOGFILE}" 2>&1
@@ -94,7 +99,8 @@ letsencrypt() {
     --preferred-challenges http \
     --cert-name="${FQDN}" \
     -d "${SSL_DOMAINS}" \
-    -m "${SSL_EMAIL}" >>"${LOGFILE}" 2>&1; then
+    -m "${SSL_EMAIL}" \
+    ${SERVER_ARGS} >>"${LOGFILE}" 2>&1; then
 
     dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
            --title "TLS certificate (Let's Encrypt)" \
