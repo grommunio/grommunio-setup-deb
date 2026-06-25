@@ -181,7 +181,7 @@ Pin: release *
 Pin-Priority: -1
 END
 
-echo "Installing dependencies. This might take a while..."
+writelog "Installing dependencies..."
 
 # make sure necessary packages are installed and up-to-date.
 apt-get update
