@@ -18,7 +18,7 @@ Depends: ${misc:Depends},
   debconf,
   debconf-i18n,
   debconf-utils,
-  grommunio-pkg-bits (>=20)
+  grommunio-pkg-bits (>=22)
 Conflicts: grammm-setup
 Description: Setup script for grommunio
  This package provides an interactive setup script for grommunio.

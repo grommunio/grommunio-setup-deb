@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.3) stable; urgency=medium
+grommunio-setup-deb (1.6.4) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
@@ -7,8 +7,9 @@ grommunio-setup-deb (1.6.3) stable; urgency=medium
     does not affect the core crommunio appliance install.
   * Convert "Installing dependencies" message into a writelog as it happens
     after the welcome screen.
+  * Minor things - g-pkg-bits minimum version 22 and clearing screen on quit.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 26 Jun 2026 10:37:09 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 26 Jun 2026 11:04:09 +1200
 
 grommunio-setup-deb (1.6.1) stable; urgency=medium
 
