@@ -47,8 +47,10 @@ setup_options_debconf () {
 	calc_option_pkg_select -s "$OPT_SELECT" PKG_SELECT PKG_FIRST
 	[ -n "$PKG_FIRST" ] && install_packages -S -L "${LOGFILE}" ${PKG_FIRST}
 	sleep 3
-	clear # clear screen
-	install_packages -A ${PKG_SELECT}
+	if [ -n "PKG_SELECT" ]; then
+		clear # clear screen
+		install_packages -A ${PKG_SELECT}
+	fi
 	GSETUP_OPT_SELECT="${PKG_SELECT}"
 }
 
