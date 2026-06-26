@@ -114,6 +114,9 @@ letsencrypt() {
 
   [ -e "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" ] && mv "/etc/nginx/conf.d/grommunio.conf.grommunio-setup" "/etc/nginx/conf.d/grommunio.conf"
 
+  writelog "Fix /etc/letsencrypt directory perms - certbot documentation says you can do this"
+  chmod -v 0755 /etc/letsencrypt/live /etc/letsencrypt/archive /etc/letsencrypt/renewal-hooks/deploy >>"${LOGFILE}" 2>&1
+
   # You only have to symlink the letsencrypt cert
   ln -snf "/etc/letsencrypt/live/${FQDN}/fullchain.pem" "${SSL_BUNDLE_T}"
   # Copy key so that gromox:gromox can be made to access it

@@ -202,9 +202,6 @@ unset DEBIAN_FRONTEND
 writelog "Disable PHP opcache"
 phpdismod opcache >>"${LOGFILE}" 2>&1
 
-writelog "Fix /etc/letsencrypt directory perms - certbot documentation says you can do this"
-chmod -v 0755 /etc/letsencrypt/live /etc/letsencrypt/archive /etc/letsencrypt/renewal-hooks/deploy >>"${LOGFILE}" 2>&1
-
 if [ -e "/etc/grommunio-common/setup_done" ]; then
   DELCONFIRM=$(dialog --no-mouse --colors --backtitle "grommunio Setup" --title "grommunio Setup already completed" --cr-wrap --inputbox \
     'grommunio Setup was already run.

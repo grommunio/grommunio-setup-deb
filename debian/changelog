@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.7) stable; urgency=medium
+grommunio-setup-deb (1.6.8) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
@@ -9,8 +9,10 @@ grommunio-setup-deb (1.6.7) stable; urgency=medium
     after the welcome screen.
   * Minor things - g-pkg-bits minimum version 22 and clearing screen on
     quit, getting rid of spurious apt output.
+  * Fix where /etc/letsencrypt dir perms are fixed till after cert is first
+    obtained.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 26 Jun 2026 14:00:09 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 26 Jun 2026 18:52:09 +1200
 
 grommunio-setup-deb (1.6.1) stable; urgency=medium
 
