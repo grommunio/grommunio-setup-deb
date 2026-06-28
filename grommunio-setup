@@ -168,6 +168,8 @@ trap 'rm -f "$TMPF"' EXIT
 writelog "Welcome dialog"
 dialog_welcome
 
+progress 0
+
 # Prevent Apache-Installation
 cat <<END > /etc/apt/preferences.d/no-apache
 Package: apache2
@@ -201,6 +203,8 @@ unset DEBIAN_FRONTEND
 
 writelog "Disable PHP opcache"
 phpdismod opcache >>"${LOGFILE}" 2>&1
+
+progress 10
 
 if [ -e "/etc/grommunio-common/setup_done" ]; then
   DELCONFIRM=$(dialog --no-mouse --colors --backtitle "grommunio Setup" --title "grommunio Setup already completed" --cr-wrap --inputbox \
@@ -308,6 +312,8 @@ apt-get install "${PACKAGES[@]}" --reinstall
 # tickets are useless... grommunio-{dav,sync} -upsteam.conf's
 rm -fv /usr/share/grommunio-common/nginx/upstreams.d/grom*upstream.conf
 apt-get install -f
+
+progress 20
 
 # fix run directory for php-fpm
 echo "d /run/php-fpm 0755 www-data gromox - -" >/etc/tmpfiles.d/run-php-fpm.conf
@@ -625,9 +631,8 @@ CONFIG_JSON=$(cat << EOF
 EOF
 )
 echo "$CONFIG_JSON" | jq > /tmp/config.json
-progress 0
+progress 30
 
-progress 10
 writelog "Config redis for Grommunio"
 {
   systemctl disable --now redis-server.service
@@ -658,7 +663,7 @@ $(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -Pv 'snapshot
 # shellcheck disable=SC2068
 systemctl enable ${SERVICES[@]} >>"${LOGFILE}" 2>&1
 
-progress 20
+progress 35
 writelog "Config stage: start db"
 systemctl enable --now mariadb >>"${LOGFILE}" 2>&1
 
@@ -698,7 +703,7 @@ setconf /etc/gromox/http.cfg host_id "${FQDN}"
 setconf /etc/gromox/smtp.cfg listen_port 24
 
 writelog "Config stage: pam config"
-progress 30
+progress 40
 if [ -e /etc/pam.d/smtp ]; then
   cp -v /etc/pam.d/smtp /etc/pam.d/smtp.save
 fi
@@ -709,7 +714,7 @@ account required pam_permit.so service=smtp
 EOF
 
 writelog "Config stage: database creation"
-progress 40
+progress 45
 echo "CREATE DATABASE IF NOT EXISTS grommunio; GRANT ALL ON grommunio.* TO 'grommunio'@'localhost' IDENTIFIED BY '${MYSQL_PASS}';" | mysql
 echo "# Do not delete this file unless you know what you do!" >/etc/grommunio-common/setup_done
 
