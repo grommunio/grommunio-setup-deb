@@ -20,6 +20,7 @@ fi
 CFG_FILE='/etc/grommunio-setup/grommunio-setup.conf'
 PKGED_CFG_FILE='/etc/grommunio-setup/packaged.conf'
 PROGNAME=`basename "$0"`
+CONFIG_MSG="grommunio Setup is installing software..."
 
 setup_options_debconf () {
 	# Appliance setup script, behave like a Debian system
@@ -168,7 +169,7 @@ trap 'rm -f "$TMPF"' EXIT
 writelog "Welcome dialog"
 dialog_welcome
 
-progress 0
+progress 0 "$CONFIG_MSG"
 
 # Prevent Apache-Installation
 cat <<END > /etc/apt/preferences.d/no-apache
@@ -185,6 +186,7 @@ Pin: release *
 Pin-Priority: -1
 END
 
+progress 10 "$CONFIG_MSG"
 writelog "Installing dependencies..."
 
 # make sure necessary packages are installed and up-to-date.
@@ -197,6 +199,7 @@ SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
   rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
   jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
   libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
+progress 20 "$CONFIG_MSG"
 export DEBIAN_FRONTEND=noninteractive
 apt-get install "${SYSTEM_PACKAGES[@]}"
 unset DEBIAN_FRONTEND
@@ -204,7 +207,7 @@ unset DEBIAN_FRONTEND
 writelog "Disable PHP opcache"
 phpdismod opcache >>"${LOGFILE}" 2>&1
 
-progress 10
+progress 30 "$CONFIG_MSG"
 
 if [ -e "/etc/grommunio-common/setup_done" ]; then
   DELCONFIRM=$(dialog --no-mouse --colors --backtitle "grommunio Setup" --title "grommunio Setup already completed" --cr-wrap --inputbox \
@@ -257,6 +260,7 @@ memory_check() {
 
 }
 
+progress 40 "$CONFIG_MSG"
 memory_check
 
 # Do optional package selection dialog
@@ -296,6 +300,7 @@ if [ "$GSETUP_REPO_SETUP" = 'true' ]; then
 fi
 writelog "Installing Grommunio-Packages"
 apt-get update
+progress 50 "$CONFIG_MSG"
 # Fix nginx not starting becuase of no SSL certs - use dummy snakeoil self-signed cert
 apt-get install grommunio-common grommunio-admin-common --reinstall
 cat >/etc/grommunio-common/nginx/ssl_certificate.conf <<EOF
@@ -313,7 +318,7 @@ apt-get install "${PACKAGES[@]}" --reinstall
 rm -fv /usr/share/grommunio-common/nginx/upstreams.d/grom*upstream.conf
 apt-get install -f
 
-progress 20
+progress 60 "$CONFIG_MSG"
 
 # fix run directory for php-fpm
 echo "d /run/php-fpm 0755 www-data gromox - -" >/etc/tmpfiles.d/run-php-fpm.conf
@@ -623,6 +628,7 @@ elif [ "${SSL_INSTALL_TYPE}" = "3" ]; then
   writelog "TLS configuration: Let's Encrypt ${SSL_EMAIL}"
 fi
 
+progress 0
 CONFIG_JSON=$(cat << EOF
 {
   "mailWebAddress": "https://${FQDN}/web",
@@ -631,8 +637,8 @@ CONFIG_JSON=$(cat << EOF
 EOF
 )
 echo "$CONFIG_JSON" | jq > /tmp/config.json
-progress 30
 
+progress 10
 writelog "Config redis for Grommunio"
 {
   systemctl disable --now redis-server.service
@@ -641,7 +647,7 @@ writelog "Config redis for Grommunio"
   systemctl enable --now redis-server@grommunio
  }  >>"${LOGFILE}" 2>&1
 
-progress 32
+progress 15
 writelog "Configure SSL Certificates for Grommunio"
 cat >/etc/grommunio-common/nginx/ssl_certificate.conf <<EOF
 ssl_certificate ${SSL_BUNDLE_T};
@@ -663,7 +669,7 @@ $(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -Pv 'snapshot
 # shellcheck disable=SC2068
 systemctl enable ${SERVICES[@]} >>"${LOGFILE}" 2>&1
 
-progress 35
+progress 20
 writelog "Config stage: start db"
 systemctl enable --now mariadb >>"${LOGFILE}" 2>&1
 
@@ -703,7 +709,7 @@ setconf /etc/gromox/http.cfg host_id "${FQDN}"
 setconf /etc/gromox/smtp.cfg listen_port 24
 
 writelog "Config stage: pam config"
-progress 40
+progress 30
 if [ -e /etc/pam.d/smtp ]; then
   cp -v /etc/pam.d/smtp /etc/pam.d/smtp.save
 fi
@@ -714,7 +720,7 @@ account required pam_permit.so service=smtp
 EOF
 
 writelog "Config stage: database creation"
-progress 45
+progress 40
 echo "CREATE DATABASE IF NOT EXISTS grommunio; GRANT ALL ON grommunio.* TO 'grommunio'@'localhost' IDENTIFIED BY '${MYSQL_PASS}';" | mysql
 echo "# Do not delete this file unless you know what you do!" >/etc/grommunio-common/setup_done
 
