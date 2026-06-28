@@ -96,7 +96,7 @@ PLEASE RECORD THE ABOVE ADMINISTRATION PASSWORD, as it is not saved on disk in p
 
 If you have created a Full CA Certificate during the process, you can download and install it from
 
-  https://${FQDN}:8443/rootCA.crt
+  http://${FQDN}:8080/rootCA.crt
 
 During the process, grommunio Setup has created an installation log which you may copy to a secure location or delete if not required anymore at
 

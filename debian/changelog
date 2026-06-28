@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.11) stable; urgency=medium
+grommunio-setup-deb (1.6.12) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
@@ -16,6 +16,7 @@ grommunio-setup-deb (1.6.11) stable; urgency=medium
     it.
   * Revise progress messages again.  Starting with installing software, and
     more updates there.
+  * Revert where to get rootCA.crt for fullCA install.
 
  -- Matthew Grant <matt@mattgrant.net.nz>  Mon, 29 Jun 2026 10:46:35 +1200
 
