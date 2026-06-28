@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.9) stable; urgency=medium
+grommunio-setup-deb (1.6.10) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
@@ -12,8 +12,10 @@ grommunio-setup-deb (1.6.9) stable; urgency=medium
   * Fix where /etc/letsencrypt dir perms are fixed till after cert is first
     obtained.
   * Adjust progress messages and exit message.
+  * Don't save Admin password to disk in clear text.  Prompt user to record
+    it.
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Sun, 28 Jun 2026 12:59:22 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Sun, 28 Jun 2026 17:54:22 +1200
 
 grommunio-setup-deb (1.6.1) stable; urgency=medium
 

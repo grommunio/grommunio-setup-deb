@@ -92,11 +92,11 @@ You can now login to grommunio admin-web UI at https://${FQDN}:8443 with
   Username: admin
   Password: ${ADMIN_PASS}
 
-Please record the above administration password.
+PLEASE RECORD THE ABOVE ADMINISTRATION PASSWORD, as it is not saved on disk in plain text.
 
 If you have created a Full CA Certificate during the process, you can download and install it from
 
-  http://${FQDN}:8080/rootCA.crt
+  https://${FQDN}:8443/rootCA.crt
 
 During the process, grommunio Setup has created an installation log which you may copy to a secure location or delete if not required anymore at
 

@@ -76,7 +76,8 @@ dialog_adminpass() {
     dialog_adminpass
   else
     ADMIN_PASS=${PASSTWO}
-    writelog "grommunio admin password: ${ADMIN_PASS}"
+    #writelog "grommunio admin password: ${ADMIN_PASS}"
+    writelog "grommunio admin password is input, you should have recorded it please."
   fi
 
 }

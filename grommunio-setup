@@ -641,7 +641,7 @@ writelog "Config redis for Grommunio"
   systemctl enable --now redis-server@grommunio
  }  >>"${LOGFILE}" 2>&1
 
-progress 15
+progress 32
 writelog "Configure SSL Certificates for Grommunio"
 cat >/etc/grommunio-common/nginx/ssl_certificate.conf <<EOF
 ssl_certificate ${SSL_BUNDLE_T};
