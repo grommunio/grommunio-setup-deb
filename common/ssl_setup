@@ -95,20 +95,24 @@ letsencrypt() {
   [ -e "/etc/nginx/conf.d/grommunio.conf" ] && mv "/etc/nginx/conf.d/grommunio.conf" "/etc/nginx/conf.d/grommunio.conf.grommunio-setup"
 
   progress 75 "$PROG_MSG"
-  if ! certbot certonly -n --nginx --agree-tos \
+  local CERTBOT_OUT=''
+  while ! CERTBOT_OUT=$(certbot certonly -n --nginx --agree-tos \
     --preferred-challenges http \
     --cert-name="${FQDN}" \
     -d "${SSL_DOMAINS}" \
     -m "${SSL_EMAIL}" \
-    ${SERVER_ARGS} >>"${LOGFILE}" 2>&1; then
+    ${SERVER_ARGS} 2>&1); do
 
+    writelog "Certbot output: '$CERTBOT_OUTPUT'"
     dialog --no-mouse --colors --cr-wrap --clear --backtitle "grommunio Setup" \
            --title "TLS certificate (Let's Encrypt)" \
-           --ok-label "Exit" \
-           --msgbox "It seems the Let's Encrypt certificate could not be generated correctly. Verify the generation of the certificate under /var/log/letsencrypt and re-run.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\nAlternatively, re-run grommunio-setup to run through the process again." 0 0 \
+           --ok-label "Retry" 
+           --cancel-label "Exit" \
+           --msgbox "It seems the Let's Encrypt certificate could not be generated correctly. Examine the certboot output below, correct the problem, then retry OR exit and rerun setup later on a fresh system.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\ncertbout output was:\n\n'${CERTBOT_OUTPUT}'" 0 0 \
 	   && STATUS=$? || STATUS=$?
-    dialog_exit $DIALOG_CANCEL
-  fi
+    dialog_exit $STATUS
+    writelog "Retrying certbot execution"
+  done
 
   progress 95 "$PROG_MSG"
 
