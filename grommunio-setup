@@ -228,7 +228,7 @@ memory_check() {
 
 }
 
-progress 20 "$CONFIG_MSG"
+progress 15 "$CONFIG_MSG"
 memory_check
 
 # Prevent Apache-Installation
@@ -246,7 +246,7 @@ Pin: release *
 Pin-Priority: -1
 END
 
-progress 30 "$CONFIG_MSG"
+progress 20 "$CONFIG_MSG"
 writelog "Installing dependencies..."
 
 # make sure necessary packages are installed and up-to-date.
@@ -259,7 +259,7 @@ SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
   rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
   jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
   libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
-progress 20 "$CONFIG_MSG"
+progress 30 "$CONFIG_MSG"
 export DEBIAN_FRONTEND=noninteractive
 apt-get install "${SYSTEM_PACKAGES[@]}"
 unset DEBIAN_FRONTEND

@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.16) stable; urgency=medium
+grommunio-setup-deb (1.6.17) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
@@ -21,8 +21,9 @@ grommunio-setup-deb (1.6.16) stable; urgency=medium
     DNS issues
   * Reblock start up, should be more consistent with later rewrite and
     restructure.
+  * Final touches - progress bar stuff
 
- -- Matthew Grant <matt@mattgrant.net.nz>  Tue, 30 Jun 2026 12:22:42 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Tue, 30 Jun 2026 13:37:42 +1200
 
 grommunio-setup-deb (1.6.1) stable; urgency=medium
 
