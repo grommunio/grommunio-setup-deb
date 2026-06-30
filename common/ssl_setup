@@ -108,9 +108,11 @@ letsencrypt() {
            --title "TLS certificate (Let's Encrypt)" \
            --yes-label "Retry" \
            --no-label "Exit" \
-           --yesno "It seems the Let's Encrypt certificate could not be generated correctly. Examine the certboot output below, correct the problem, then retry OR exit and rerun setup later on a fresh system.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\ncertbout output was:\n\n${CERTBOT_OUT}" 0 0 \
+           --yesno "(Scroll this dialog with the 'j' and 'k' keys)\n\nIt seems the Let's Encrypt certificate could not be generated correctly. Examine the certboot output below, correct the problem, then retry OR exit and rerun setup later on a fresh system.\nThe command used to generate the certificates:\n\ncertbot certonly -n --standalone --agree-tos --preferred-challenges http --cert-name=\"${FQDN}\" -d \"${SSL_DOMAINS}\" -m \"${SSL_EMAIL}\"\n\ncertbout output was:\n\n${CERTBOT_OUT}" 0 0 \
 	   && STATUS=$? || STATUS=$?
     dialog_exit $STATUS
+    progress 75 "Retrying getting an LE certificate..."
+    sleep 2
     writelog "Retrying certbot execution"
   done
 
