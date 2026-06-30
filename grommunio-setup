@@ -169,46 +169,14 @@ trap 'rm -f "$TMPF"' EXIT
 writelog "Welcome dialog"
 dialog_welcome
 
-progress 0 "$CONFIG_MSG"
+progress 5 "$CONFIG_MSG"
 
-# Prevent Apache-Installation
-cat <<END > /etc/apt/preferences.d/no-apache
-Package: apache2
-Pin: release *
-Pin-Priority: -1
-
-Package: apache2-bin
-Pin: release *
-Pin-Priority: -1
-
-Package: libapache2-mod-php
-Pin: release *
-Pin-Priority: -1
-END
+# Do optional package selection dialog
+# Don't gsetup_preseed() here as values to be preseeded not yet set (-n)
+# Source g-setup vars etc (-s setup-grommunio-setup)
+do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -p setup_debconf_preseed -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
 
 progress 10 "$CONFIG_MSG"
-writelog "Installing dependencies..."
-
-# make sure necessary packages are installed and up-to-date.
-apt-get update
-apt-get dist-upgrade
-echo "postfix	postfix/mailname string $DOMAIN" | debconf-set-selections
-echo "postfix	postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
-SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
-  postfix-mysql php php-igbinary php-redis sqlite3 php php-fpm curl fetchmail
-  rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
-  jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
-  libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
-progress 20 "$CONFIG_MSG"
-export DEBIAN_FRONTEND=noninteractive
-apt-get install "${SYSTEM_PACKAGES[@]}"
-unset DEBIAN_FRONTEND
-
-writelog "Disable PHP opcache"
-phpdismod opcache >>"${LOGFILE}" 2>&1
-
-progress 30 "$CONFIG_MSG"
-
 if [ -e "/etc/grommunio-common/setup_done" ]; then
   DELCONFIRM=$(dialog --no-mouse --colors --backtitle "grommunio Setup" --title "grommunio Setup already completed" --cr-wrap --inputbox \
     'grommunio Setup was already run.
@@ -260,13 +228,46 @@ memory_check() {
 
 }
 
-progress 40 "$CONFIG_MSG"
+progress 20 "$CONFIG_MSG"
 memory_check
 
-# Do optional package selection dialog
-# Don't gsetup_preseed() here as values to be preseeded not yet set (-n)
-# Source g-setup vars etc (-s setup-grommunio-setup)
-do_debconf_config -x grommunio-setup -n -c /usr/share/grommunio-setup/scripts/grommunio-setup.config -p setup_debconf_preseed -s /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
+# Prevent Apache-Installation
+cat <<END > /etc/apt/preferences.d/no-apache
+Package: apache2
+Pin: release *
+Pin-Priority: -1
+
+Package: apache2-bin
+Pin: release *
+Pin-Priority: -1
+
+Package: libapache2-mod-php
+Pin: release *
+Pin-Priority: -1
+END
+
+progress 30 "$CONFIG_MSG"
+writelog "Installing dependencies..."
+
+# make sure necessary packages are installed and up-to-date.
+apt-get update
+apt-get dist-upgrade
+echo "postfix	postfix/mailname string $DOMAIN" | debconf-set-selections
+echo "postfix	postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
+SYSTEM_PACKAGES=(mariadb-server mariadb-client redis nginx postfix postfix-lmdb
+  postfix-mysql php php-igbinary php-redis sqlite3 php php-fpm curl fetchmail
+  rspamd certbot python3-certbot-nginx libsasl2-2 libsasl2-modules sasl2-bin
+  jq firewalld clamav clamav-freshclam clamav-daemon ssl-cert
+  libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static gpg)
+progress 20 "$CONFIG_MSG"
+export DEBIAN_FRONTEND=noninteractive
+apt-get install "${SYSTEM_PACKAGES[@]}"
+unset DEBIAN_FRONTEND
+
+writelog "Disable PHP opcache"
+phpdismod opcache >>"${LOGFILE}" 2>&1
+
+progress 40 "$CONFIG_MSG"
 
 unset MYSQL_DB
 unset MYSQL_HOST
