@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.6.18) stable; urgency=medium
+grommunio-setup-deb (1.6.19) stable; urgency=medium
 
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
