@@ -143,12 +143,14 @@ if [ "$1" = "update" ]; then
   if ! command apt-get update -qq -y "$@" >> "${LOGFILE}" 2>&1; then
     echo "APT: Update failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${LOGFILE}"|tee -a "${LOGFILE}"
+    exit 1
   fi
 elif [ "$1" = "dist-upgrade" ]; then
   shift
   if ! command apt-get dist-upgrade -qq -y >/dev/null 2>&1; then
     echo "APT: Dist-Upgrade failed."|tee -a "${LOGFILE}"
     echo "Please check the logfile: ${APT_LOGFILE}"|tee -a "${LOGFILE}"
+    exit 1
   fi
 elif [ "$1" = "install" ]; then
   shift
