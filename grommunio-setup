@@ -704,6 +704,7 @@ if [ -f /etc/nginx/sites-enabled/default-site.conf ]; then
 fi
 
 writelog "Config stage: gromox config"
+setconf /etc/gromox/gromox.cfg http_remote_host_hdr X-Real-IP
 setconf /etc/gromox/http.cfg listen_port 10080
 setconf /etc/gromox/http.cfg http_support_ssl true
 setconf /etc/gromox/http.cfg listen_ssl_port 10443
@@ -732,6 +733,9 @@ setconf /etc/gromox/mysql_adaptor.cfg mysql_username "${MYSQL_USER}"
 setconf /etc/gromox/mysql_adaptor.cfg mysql_password "${MYSQL_PASS}"
 setconf /etc/gromox/mysql_adaptor.cfg mysql_dbname "${MYSQL_DB}"
 setconf /etc/gromox/mysql_adaptor.cfg schema_upgrade "host:${FQDN}"
+if [ "${MYSQL_INSTALL_TYPE}" = "2" ]; then
+setconf /etc/gromox/mysql_adaptor.cfg mysql_host "${MYSQL_HOST}"
+fi
 
 # use system-timezone
 TZ="$(readlink /etc/localtime)"
@@ -739,27 +743,11 @@ TZ="${TZ#/usr/share/zoneinfo/}"
 
 writelog "Config stage: autodiscover configuration"
 progress 50
-cat >/etc/gromox/autodiscover.ini <<EOF
-[database]
-host = ${MYSQL_HOST}
-username = '${MYSQL_USER}'
-password = '${MYSQL_PASS}'
-dbname = '${MYSQL_DB}'
-
-[exchange]
-organization = '${X500}'
-hostname = ${FQDN}
-mapihttp = 1
-
-[default]
-timezone = '${TZ}'
-
-[system]
-
-[http-proxy]
-/var/lib/gromox/user = ${FQDN}
-/var/lib/gromox/domain = ${FQDN}
+if [ -n "${X500}" ] ; then
+cat >/etc/gromox/autodiscover.cfg <<EOF
+x500_org_name = ${X500}
 EOF
+fi
 
 cat >/etc/grommunio-admin-api/conf.d/database.yaml <<EOF
 DB:
@@ -1229,7 +1217,7 @@ user = ${MYSQL_USER}
 password = ${MYSQL_PASS}
 hosts = ${MYSQL_HOST}
 dbname = ${MYSQL_DB}
-query = SELECT 1 FROM domains WHERE domain_status=0 AND domainname='%s'
+query = SELECT 1 FROM domains WHERE domain_status=0 AND domainname=_utf8mb4'%s' COLLATE utf8mb4_general_ci
 EOF
 
 cat >/etc/postfix/grommunio-virtual-mailbox-alias-maps.cf <<EOF
@@ -1237,7 +1225,7 @@ user = ${MYSQL_USER}
 password = ${MYSQL_PASS}
 hosts = ${MYSQL_HOST}
 dbname = ${MYSQL_DB}
-query = SELECT mainname FROM aliases WHERE aliasname='%s'
+query = SELECT mainname FROM aliases WHERE aliasname=_utf8mb4'%s' COLLATE utf8mb4_general_ci UNION SELECT destination FROM forwards WHERE username=_utf8mb4'%s' COLLATE utf8mb4_general_ci AND forward_type = 1
 EOF
 
 cat >/etc/postfix/grommunio-virtual-mailbox-maps.cf <<EOF
@@ -1245,21 +1233,35 @@ user = ${MYSQL_USER}
 password = ${MYSQL_PASS}
 hosts = ${MYSQL_HOST}
 dbname = ${MYSQL_DB}
-query = SELECT 1 FROM users WHERE username='%s'
+query = SELECT 1 FROM users WHERE username=_utf8mb4'%s' COLLATE utf8mb4_general_ci
 EOF
 
+cat > /etc/postfix/grommunio-bcc-forwards.cf <<EOF
+user = ${MYSQL_USER}
+password = ${MYSQL_PASS}
+hosts = ${MYSQL_HOST}
+dbname = ${MYSQL_DB}
+query = SELECT destination FROM forwards WHERE username=_utf8mb4'%s' COLLATE utf8mb4_general_ci AND forward_type = 0
+EOF
+
+# Base postfix recipient restrictions (the archive role extends these and the
+# removal path resets them back to this value).
+CORE_RCPT_RESTRICTIONS="permit_sasl_authenticated,permit_mynetworks,reject_unknown_recipient_domain,reject_non_fqdn_hostname,reject_non_fqdn_sender,reject_non_fqdn_recipient,reject_unauth_destination,reject_unauth_pipelining"
 postconf -e \
   myhostname="${FQDN}" \
   virtual_mailbox_domains="mysql:/etc/postfix/grommunio-virtual-mailbox-domains.cf" \
   virtual_mailbox_maps="mysql:/etc/postfix/grommunio-virtual-mailbox-maps.cf" \
   virtual_alias_maps="mysql:/etc/postfix/grommunio-virtual-mailbox-alias-maps.cf" \
+  recipient_bcc_maps="mysql:/etc/postfix/grommunio-bcc-forwards.cf" \
+  unverified_recipient_reject_code=550 \
   virtual_transport="smtp:[::1]:24" \
   relayhost="${RELAYHOST}" \
   inet_interfaces=all \
   smtpd_helo_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_invalid_hostname,reject_non_fqdn_hostname \
   smtpd_sender_restrictions=reject_non_fqdn_sender,permit_sasl_authenticated,permit_mynetworks \
-  smtpd_recipient_restrictions=permit_sasl_authenticated,permit_mynetworks,reject_unknown_recipient_domain,reject_non_fqdn_hostname,reject_non_fqdn_sender,reject_non_fqdn_recipient,reject_unauth_destination,reject_unauth_pipelining \
+  smtpd_recipient_restrictions=${CORE_RCPT_RESTRICTIONS}
   smtpd_data_restrictions=reject_unauth_pipelining \
+  smtpd_discard_ehlo_keywords=chunking \
   smtpd_tls_security_level=may \
   smtpd_tls_auth_only=no \
   smtpd_tls_cert_file="${SSL_BUNDLE_T}" \
@@ -1272,8 +1274,11 @@ postconf -e \
   smtpd_sasl_auth_enable=yes \
   broken_sasl_auth_clients=yes \
   smtpd_sasl_security_options=noanonymous \
-  smtpd_sasl_local_domain= smtpd_milters=inet:localhost:11332 \
+  smtpd_sasl_local_domain=\
+  smtpd_milters=inet:localhost:11332 \
   milter_default_action=accept \
+  smtp_tls_security_level=may \
+  smtp_use_tls=yes \
   milter_protocol=6
 postconf -M tlsmgr/unix="tlsmgr unix - - n 1000? 1 tlsmgr"
 postconf -M submission/inet="submission inet n - n - - smtpd"
