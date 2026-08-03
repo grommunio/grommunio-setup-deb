@@ -1,5 +1,5 @@
-grommunio-setup-deb (1.6.21) stable; urgency=medium
-
+grommunio-setup-deb (1.7) stable; urgency=medium
+  * Release 1.7
   * Display welcome message earlier before any dependencies such as nginx
     etc are installed.
   * Open out certbot /etc/letsencrypt directory perms so that things work.
