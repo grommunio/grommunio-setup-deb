@@ -1,4 +1,4 @@
-grommunio-setup-deb (1.7.1) stable; urgency=medium
+grommunio-setup-deb (1.7.2) stable; urgency=medium
   * Fix permision problems in /etc involving grommunio DB password.
  
  -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 30 Jul 2026 20:04:59 +1200

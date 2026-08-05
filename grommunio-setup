@@ -711,7 +711,7 @@ precreate_gromox_cfg () {
 	for GCFG_FILE in ${GCFG_FILES}; do
 		touch "/etc/gromox/${GCFG_FILE}"
 		chown grommunio:gromoxcf "/etc/gromox/${GCFG_FILE}"
-		chomd 0640 "/etc/gromox/${GCFG_FILE}"
+		chmod 0640 "/etc/gromox/${GCFG_FILE}"
 	done
 }
 
