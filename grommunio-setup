@@ -703,7 +703,20 @@ if [ -f /etc/nginx/sites-enabled/default-site.conf ]; then
 	rm -vf /etc/nginx/sites-enabled/default-site.conf >>"${LOGFILE}" 2>&1
 fi
 
+# Leave out mysql_adaptor.cfg as this is seperate;y setup with password material
+GCFG_FILES="autodiscover.cfg delivery.cfg exchange_emsmdb.cfg exchange_nsp.cfg exmdb_local.cfg exmdb_provider.cfg gromox.cfg http.cfg imap.cfg midb.cfg pop3.cfg smtp.cfg zcore.cfg"
+precreate_gromox_cfg () {
+	# touch gromox files into existence to preset perms
+	local GCFG_FILE
+	for GCFG_FILE in ${GCFG_FILES}; do
+		touch "/etc/gromox/${GCFG_FILE}"
+		chown grommunio:gromoxcf "/etc/gromox/${GCFG_FILE}"
+		chomd 0640 "/etc/gromox/${GCFG_FILE}"
+	done
+}
+
 writelog "Config stage: gromox config"
+precreate_gromox_cfg
 setconf /etc/gromox/gromox.cfg http_remote_host_hdr X-Real-IP
 setconf /etc/gromox/http.cfg listen_port 10080
 setconf /etc/gromox/http.cfg http_support_ssl true
@@ -729,6 +742,8 @@ echo "CREATE DATABASE IF NOT EXISTS grommunio; GRANT ALL ON grommunio.* TO 'grom
 echo "# Do not delete this file unless you know what you do!" >/etc/grommunio-common/setup_done
 
 writelog "Config stage: database configuration"
+YE_OLDE_UMASK=$(umask)
+umask 0077
 setconf /etc/gromox/mysql_adaptor.cfg mysql_username "${MYSQL_USER}"
 setconf /etc/gromox/mysql_adaptor.cfg mysql_password "${MYSQL_PASS}"
 setconf /etc/gromox/mysql_adaptor.cfg mysql_dbname "${MYSQL_DB}"
@@ -736,6 +751,9 @@ setconf /etc/gromox/mysql_adaptor.cfg schema_upgrade "host:${FQDN}"
 if [ "${MYSQL_INSTALL_TYPE}" = "2" ]; then
 setconf /etc/gromox/mysql_adaptor.cfg mysql_host "${MYSQL_HOST}"
 fi
+umask "$YE_OLDE_UMASK"
+chown grommunio:gromoxcf /etc/gromox/mysql_adaptor.cfg
+chmod 0640 /etc/gromox/mysql_adaptor.cfg
 
 # use system-timezone
 TZ="$(readlink /etc/localtime)"
@@ -749,6 +767,8 @@ x500_org_name = ${X500}
 EOF
 fi
 
+YE_OLDE_UMASK=$(umask)
+umask 0077
 cat >/etc/grommunio-admin-api/conf.d/database.yaml <<EOF
 DB:
   host: '${MYSQL_HOST}'
@@ -756,6 +776,9 @@ DB:
   pass: '${MYSQL_PASS}'
   database: '${MYSQL_DB}'
 EOF
+umask "$YE_OLDE_UMASK"
+chown grommunio:grommunio /etc/grommunio-admin-api/conf.d/database.yaml
+chmod 0640 /etc/grommunio-admin-api/conf.d/database.yaml
 
 writelog "Config stage: database initialization"
 gromox-dbop -C >>"${LOGFILE}" 2>&1
@@ -1212,6 +1235,8 @@ done
 writelog "Config stage: postfix configuration"
 progress 80
 
+YE_OLDE_UMASK=$(umask)
+umask 0077
 cat >/etc/postfix/grommunio-virtual-mailbox-domains.cf <<EOF
 user = ${MYSQL_USER}
 password = ${MYSQL_PASS}
@@ -1243,6 +1268,7 @@ hosts = ${MYSQL_HOST}
 dbname = ${MYSQL_DB}
 query = SELECT destination FROM forwards WHERE username=_utf8mb4'%s' COLLATE utf8mb4_general_ci AND forward_type = 0
 EOF
+umask "$YE_OLDE_UMASK"
 
 # Base postfix recipient restrictions (the archive role extends these and the
 # removal path resets them back to this value).
