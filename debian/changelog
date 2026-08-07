@@ -1,7 +1,10 @@
-grommunio-setup-deb (1.7.2) stable; urgency=medium
+grommunio-setup-deb (1.7.3) stable; urgency=medium
   * Fix permision problems in /etc involving grommunio DB password.
+  * Fix issues with processing optional feature selection, specifically
+    removing all commas from Debconf comma separated OPT_SELECT package
+    selection list variable.
  
- -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 30 Jul 2026 20:04:59 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 07 Aug 2026 15:43:29 +1200
 
 grommunio-setup-deb (1.7) stable; urgency=medium
   * Release 1.7

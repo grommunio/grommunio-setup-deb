@@ -36,7 +36,7 @@ setup_options_debconf () {
 	gsetup_preseed
 	db_get grommunio-setup/setup-options-select
 	local OPT_SELECT="$RET"
-	OPT_SELECT=$(echo "$OPT_SELECT" | perl -pe 's/,//')
+	OPT_SELECT=$(echo "$OPT_SELECT" | perl -pe 's/,//g')
 	# reset dialog questions back to defaults - done here so that
 	# debconf choices can be pre-seeded
 	setup_debconf_reset
