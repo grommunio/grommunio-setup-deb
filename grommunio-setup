@@ -291,7 +291,7 @@ user_management >>"${LOGFILE}" 2>&1
 # shellcheck source=common/repo
 PACKAGES=(gromox grommunio-admin-api grommunio-admin-web grommunio-index
   grommunio-admin-common grommunio-common grommunio-web grommunio-sync
-  grommunio-dav grommunio-dbconf nginx-module-vts)
+  grommunio-dav grommunio-dbconf grommunio-admin-api-mod-vts)
 . "${DATADIR}/common/repo"
 if [ "$GSETUP_REPO_SETUP" = 'true' ]; then
   if ! setup_repo ; then

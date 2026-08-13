@@ -1,10 +1,14 @@
-grommunio-setup-deb (1.7.3) stable; urgency=medium
+grommunio-setup-deb (1.7.4) stable; urgency=medium
   * Fix permision problems in /etc involving grommunio DB password.
   * Fix issues with processing optional feature selection, specifically
     removing all commas from Debconf comma separated OPT_SELECT package
     selection list variable.
+  * Install grommunio-admin-api-mod-vts package instead nginx-module-vts.
+    This package depends on nginx-module-vts, and installs the nginx config
+    needed to make the /statusmonitor location return the stats ahd status
+    neded for AAPI to report web stats and host status information.
  
- -- Matthew Grant <matt@mattgrant.net.nz>  Fri, 07 Aug 2026 15:43:29 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 13 Aug 2026 20:26:38 +1200
 
 grommunio-setup-deb (1.7) stable; urgency=medium
   * Release 1.7
