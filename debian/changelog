@@ -1,4 +1,6 @@
-grommunio-setup-deb (1.7.4) stable; urgency=medium
+grommunio-setup-deb (1.7.5) stable; urgency=medium
+  * Add shared/grommunio/site-domain mail domain debconf setting to
+    support grommunio-files.
   * Fix permision problems in /etc involving grommunio DB password.
   * Fix issues with processing optional feature selection, specifically
     removing all commas from Debconf comma separated OPT_SELECT package
@@ -8,7 +10,7 @@ grommunio-setup-deb (1.7.4) stable; urgency=medium
     needed to make the /statusmonitor location return the stats ahd status
     neded for AAPI to report web stats and host status information.
  
- -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 13 Aug 2026 20:26:38 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 27 Aug 2026 16:08:33 +1200
 
 grommunio-setup-deb (1.7) stable; urgency=medium
   * Release 1.7

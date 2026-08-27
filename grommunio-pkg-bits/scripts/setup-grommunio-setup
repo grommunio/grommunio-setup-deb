@@ -10,6 +10,7 @@ AUTO_CONFIG='false'
 . /usr/share/grommunio-pkg-bits/scripts/setup-include.sh
 SHARED_TEMPLATES='
 shared/grommunio/site-fqdn
+shared/grommunio/site-domain
 shared/grommunio/auto-config
 shared/grommunio/admin-password
 shared/grommunio/admin-password-again
