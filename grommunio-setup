@@ -10,12 +10,11 @@
 # Exit on error - prevents untoward surprises happening
 set -e
 
-if [ "$(id -u)" -ne 0 ]; then
-  exec sudo "${BASH_SOURCE[0]}"
-fi
-
 # Source set up variables and setup-include.sh
 . /usr/share/grommunio-pkg-bits/scripts/setup-grommunio-setup
+
+# Only run this programe if root
+check_if_root
 
 CFG_FILE='/etc/grommunio-setup/grommunio-setup.conf'
 PKGED_CFG_FILE='/etc/grommunio-setup/packaged.conf'
