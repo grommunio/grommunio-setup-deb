@@ -1,4 +1,6 @@
-grommunio-setup-deb (1.7.6) stable; urgency=medium
+grommunio-setup-deb (1.8) stable; urgency=medium
+  * Release 1.8 of grommunio-setup-deb
+  * Support for grommunio-files
   * Remove if-not-root sudo call at start as it breaks the getopt options
     processing.
   * Add shared/grommunio/site-domain mail domain debconf setting to
@@ -12,7 +14,7 @@ grommunio-setup-deb (1.7.6) stable; urgency=medium
     needed to make the /statusmonitor location return the stats ahd status
     neded for AAPI to report web stats and host status information.
  
- -- Matthew Grant <matt@mattgrant.net.nz>  Thu, 27 Aug 2026 17:11:00 +1200
+ -- Matthew Grant <matt@mattgrant.net.nz>  Mon, 31 Aug 2026 14:20:18 +1200
 
 grommunio-setup-deb (1.7) stable; urgency=medium
   * Release 1.7
