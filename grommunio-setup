@@ -1163,7 +1163,7 @@ antivirus {
   clamav {
     # If set force this action if any virus is found (default unset: no action is forced)
     # action = "reject";
-    message = '${SCANNER}: virus found: "${VIRUS}"';
+    message = '\${SCANNER}: virus found: "\${VIRUS}"';
     # Scan mime_parts separately - otherwise the complete mail will be transferred to AV Scanner
     scan_mime_parts = true;
     # Scanning Text is suitable for some av scanner databases (e.g. Sanesecurity)
@@ -1208,6 +1208,17 @@ group "antivirus" {
   }
 }
 EOF
+
+# Enable local TCP socket for clamav-daemon.socket
+if systemctl is-enabled clamav-daemon.socket; then
+  mkdir -p /etc/systemd/system/clamav-daemon.socket.d
+  cat > /etc/systemd/system/clamav-daemon.socket.d/tcpsocket.conf <<EOF
+[Socket]
+ListenStream=127.0.0.1:3310
+EOF
+  systemctl daemon-reload
+  systemctl restart clamav-daemon.socket
+fi
 
 writelog "Config stage: gromox tls configuration"
 setconf /etc/gromox/http.cfg http_certificate_path "${SSL_BUNDLE_T}"
