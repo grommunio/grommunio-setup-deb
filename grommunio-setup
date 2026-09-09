@@ -317,6 +317,24 @@ ln -s /etc/grommunio-common/nginx/ssl_certificate.conf /etc/grommunio-admin-comm
 
 # reinstall in case of "removealldata"
 apt-get install "${PACKAGES[@]}" --reinstall
+
+# Debian's default systemd preset will enable all newly installed services.
+# As gromox-istore will not work out of the box (w/o further configuration) we
+# will disable it at this point.
+if systemctl is-enabled gromox-istore.service; then
+  systemctl --now disable gromox-istore.service
+fi
+# gromox-snapshot is disabled in an appliance by default and only works if
+# subvolume_root and snapshot_archive is on the same filesystem even if it is
+# not using btrfs but cp instead.
+if systemctl is-enabled gromox-snapshot.service; then
+  systemctl --now disable gromox-snapshot.service
+fi
+# gromox-cleaner is disabled in the appliance be default.
+if systemctl is-enabled gromox-cleaner.service; then
+  systemctl --now disable gromox-cleaner.service
+fi
+
 # tickets are useless... grommunio-{dav,sync} -upsteam.conf's
 rm -fv /usr/share/grommunio-common/nginx/upstreams.d/grom*upstream.conf
 apt-get install -f
@@ -667,7 +685,7 @@ PHPVER="$(apt-cache show php |awk '/^Depends:/ {sub("php","", $2);print$2}')"
 
 writelog "Config stage: enable all services"
 SERVICES=(redis-server@grommunio.service "php${PHPVER}-fpm.service" nginx.service
-$(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -Pv 'snapshot|cleaner')
+$(systemctl list-unit-files 'grom*' --no-legend|cut -d\  -f1 |grep -Pv 'snapshot|cleaner|istore')
   clamav-freshclam.service clamav-daemon.service rspamd.service)
 # shellcheck disable=SC2068
 systemctl enable ${SERVICES[@]} >>"${LOGFILE}" 2>&1
