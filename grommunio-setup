@@ -1281,7 +1281,7 @@ postconf -e \
   inet_interfaces=all \
   smtpd_helo_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_invalid_hostname,reject_non_fqdn_hostname \
   smtpd_sender_restrictions=reject_non_fqdn_sender,permit_sasl_authenticated,permit_mynetworks \
-  smtpd_recipient_restrictions=${CORE_RCPT_RESTRICTIONS}
+  smtpd_recipient_restrictions=${CORE_RCPT_RESTRICTIONS} \
   smtpd_data_restrictions=reject_unauth_pipelining \
   smtpd_discard_ehlo_keywords=chunking \
   smtpd_tls_security_level=may \
