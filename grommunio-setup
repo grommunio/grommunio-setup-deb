@@ -1153,7 +1153,7 @@ systemctl daemon-reload >>"${LOGFILE}" 2>&1
 systemctl enable --now grommunio-ham-run.timer grommunio-ham-run.service >>"${LOGFILE}" 2>&1
 
 writelog "Configure antivirus in antispam"
-cat >/etc/rspamd/local.d/antivirus.conf <<EOF
+cat >/etc/rspamd/local.d/antivirus.conf <<'EOF'
 # local.d/antivirus.conf
 
 # multiple scanners could be checked, for each we create a configuration block with an arbitrary name
@@ -1198,7 +1198,7 @@ clamav {
 }
 EOF
 
-cat >/etc/rspamd/local.d/antivirus_group.conf <<EOF
+cat >/etc/rspamd/local.d/antivirus_group.conf <<'EOF'
 symbol "CLAM_VIRUS" {
   weight = 4;
   description = "ClamAV found a Virus";
