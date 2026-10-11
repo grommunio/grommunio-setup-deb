@@ -1,3 +1,9 @@
+grommunio-setup-deb (1.8.2) stable; urgency=medium
+
+  * Fix rspamd clamav config syntax errors.
+
+ -- Matthew Grant <matt@mattgrant.net.nz>  Sun, 11 Oct 2026 17:35:43 +1300
+
 grommunio-setup-deb (1.8) stable; urgency=medium
   * Release 1.8 of grommunio-setup-deb
   * Support for grommunio-files
