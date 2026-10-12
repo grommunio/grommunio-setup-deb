@@ -1182,7 +1182,7 @@ clamav {
   # can be specified multiple times to pool servers
   # can be set to a path to a unix socket
   # Enable this in local.d/antivirus.conf
-  servers = "/run/clamav/clamav.ctl";
+  servers = "/run/clamav/clamd.ctl";
   # if patterns is specified virus name will be matched against provided regexes and the related
   # symbol will be yielded if a match is found. If no match is found, default symbol is yielded.
   #patterns {
@@ -1199,9 +1199,11 @@ clamav {
 EOF
 
 cat >/etc/rspamd/local.d/antivirus_group.conf <<'EOF'
-symbol "CLAM_VIRUS" {
-  weight = 4;
-  description = "ClamAV found a Virus";
+symbols = {
+  "CLAM_VIRUS" {
+    weight = 4;
+    description = "ClamAV found a Virus";
+  }
 }
 EOF
 
