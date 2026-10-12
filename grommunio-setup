@@ -285,6 +285,7 @@ unset SSL_KEY
 writelog "Installation / update of packages"
 user_management() {
   adduser postfix sasl
+  adduser _rspamd clamav
 }
 user_management >>"${LOGFILE}" 2>&1
 
