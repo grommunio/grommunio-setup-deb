@@ -719,12 +719,16 @@ precreate_gromox_cfg () {
 writelog "Config stage: gromox config"
 precreate_gromox_cfg
 setconf /etc/gromox/gromox.cfg http_remote_host_hdr X-Real-IP
-setconf /etc/gromox/http.cfg listen_port 10080
-setconf /etc/gromox/http.cfg http_support_ssl true
-setconf /etc/gromox/http.cfg listen_ssl_port 10443
+setconf /etc/gromox/gromox.cfg http_listen '[::1]:10080'
+setconf /etc/gromox/gromox.cfg istore_standalone 0
+
 setconf /etc/gromox/http.cfg host_id "${FQDN}"
 
-setconf /etc/gromox/smtp.cfg listen_port 24
+setconf /etc/gromox/gromox.cfg lda_listen '[::]:24'
+
+setconf /etc/gromox/gromox.cfg imap_listen '[[::]:143'
+
+setconf /etc/gromox/gromox.cfg pop3_listen '[[::]:110'
 
 writelog "Config stage: pam config"
 progress 30
@@ -1209,24 +1213,28 @@ symbols = {
 EOF
 
 writelog "Config stage: gromox tls configuration"
+setconf /etc/gromox/gromox.cfg http_listen_tls '[::1]:10443'
+setconf /etc/gromox/http.cfg http_support_tls true
 setconf /etc/gromox/http.cfg http_certificate_path "${SSL_BUNDLE_T}"
 setconf /etc/gromox/http.cfg http_private_key_path "${SSL_KEY_T}"
 
-setconf /etc/gromox/imap.cfg imap_support_starttls true
-setconf /etc/gromox/imap.cfg listen_ssl_port 993
+setconf /etc/gromox/gromox.cfg lda_listen_tls '[::1]:10465'
+setconf /etc/gromox/smtp.cfg smtp_support_starttls true
+setconf /etc/gromox/smtp.cfg smtp_certificate_path "${SSL_BUNDLE_T}"
+setconf /etc/gromox/smtp.cfg smtp_private_key_path "${SSL_KEY_T}"
+
+setconf /etc/gromox/gromox.cfg imap_listen_tls '[::]:993'
+setconf /etc/gromox/imap.cfg imap_support_tls true
 setconf /etc/gromox/imap.cfg imap_certificate_path "${SSL_BUNDLE_T}"
 setconf /etc/gromox/imap.cfg imap_private_key_path "${SSL_KEY_T}"
 
+setconf /etc/gromox/gromox.cfg pop3_listen_tls '[::]:995'
 setconf /etc/gromox/pop3.cfg pop3_support_stls true
-setconf /etc/gromox/pop3.cfg listen_ssl_port 995
 setconf /etc/gromox/pop3.cfg pop3_certificate_path "${SSL_BUNDLE_T}"
 setconf /etc/gromox/pop3.cfg pop3_private_key_path "${SSL_KEY_T}"
 
-# Domain and X500
-writelog "Config stage: gromox domain and x500 configuration"
-for SERVICE in http midb zcore imap pop3 smtp delivery; do
-  setconf /etc/gromox/${SERVICE}.cfg default_domain "${DOMAIN}"
-done
+# X500_ORG
+writelog "Config stage: gromox x500 configuration"
 for CFG in midb.cfg zcore.cfg exmdb_local.cfg exmdb_provider.cfg exchange_emsmdb.cfg exchange_nsp.cfg; do
   setconf "/etc/gromox/${CFG}" x500_org_name "${X500}"
 done
