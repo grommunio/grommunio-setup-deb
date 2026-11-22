@@ -124,10 +124,7 @@ fi
 #APT_EXTRA_ARGS='-qq'
 APT_LOGFILE="/var/log/apt/term.log"
 LOGFILE="/var/log/grommunio-setup.log"
-if ! test -e "$LOGFILE"; then
-  true >"$LOGFILE"
-  chmod 0600 "$LOGFILE"
-fi
+( umask 077 && : >>"$LOGFILE" ) && chmod 0600 "$LOGFILE"
 
 apt-get() {
 # Remove any stray '-y' as we re-add them below when needed
@@ -372,7 +369,7 @@ if [ "${MYSQL_INSTALL_TYPE}" = "2" ]; then
       writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} ${MYSQL_DB}"
     elif [ -n "${MYSQL_HOST}" ] && [ -n "${MYSQL_USER}" ] && [ -n "${MYSQL_PASS}" ] && [ -n "${MYSQL_DB}" ]; then
       echo "show tables;" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASS}" "${MYSQL_DB}" >/dev/null 2>&1 && RETCMD=$? || RETCMD=$?
-      writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASS} ${MYSQL_DB}"
+      writelog "mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p ${MYSQL_DB}"
     else
       failonme 1 && RETCMD=$? || RETCMD=$?
     fi
@@ -399,7 +396,7 @@ else
     fi
   done
 fi
-writelog "MySQL configuration: Host: ${MYSQL_HOST}, User: ${MYSQL_USER}, Password: ${MYSQL_PASS}, Database: ${MYSQL_DB}"
+writelog "MySQL configuration: Host: ${MYSQL_HOST}, User: ${MYSQL_USER}, Database: ${MYSQL_DB}"
 
 if [ -z "$GSETUP_ADMIN_PASSWORD" ]; then
 	dialog_adminpass
